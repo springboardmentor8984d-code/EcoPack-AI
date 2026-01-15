@@ -1,0 +1,51 @@
+material_id,material_name,material_type,strength,weight_capacity_kg,cost_per_unit_inr,biodegradability_score,co2_score,recyclability_percentage
+1,Recycled Paper,Paper-based,2,5,3,9,3,95
+2,Kraft Paper,Paper-based,2,7,4,9,3,90
+3,Corrugated Cardboard,Paper-based,3,20,15,8,4,95
+4,Molded Pulp,Paper-based,2,10,12,9,3,90
+5,Paper Foam,Paper-based,1,3,6,9,3,85
+6,Bamboo Fiber,Plant-based,3,15,20,9,2,80
+7,Bagasse (Sugarcane Fiber),Plant-based,2,8,10,10,2,85
+8,Wheat Straw Fiber,Plant-based,2,7,9,10,2,80
+9,Rice Husk Packaging,Plant-based,2,6,8,9,3,75
+10,Corn Husk Fiber,Plant-based,2,6,9,9,3,75
+11,Areca Leaf Plates,Leaf-based,2,5,7,10,1,70
+12,Banana Leaf Packaging,Leaf-based,1,3,5,10,1,60
+13,Palm Leaf Packaging,Leaf-based,2,6,8,10,1,65
+14,Seaweed Packaging,Marine-based,1,2,12,10,1,50
+15,Mushroom Mycelium,Bio-composite,3,12,25,10,1,90
+16,PLA (Corn Starch Plastic),Bioplastic,2,6,18,7,4,60
+17,PHA Bioplastic,Bioplastic,3,10,30,8,3,70
+18,Starch-based Plastic,Bioplastic,2,5,15,8,4,65
+19,Cellulose Film,Bio-film,1,2,10,9,2,75
+20,Compostable Film,Bio-film,1,2,14,9,3,70
+21,Recycled PET (rPET),Recycled Plastic,3,20,22,4,5,90
+22,Recycled HDPE,Recycled Plastic,3,18,20,4,5,95
+23,Glass (Recycled),Mineral-based,3,30,25,1,6,100
+24,Aluminum (Recycled),Metal,3,40,30,1,5,100
+25,Tin Containers,Metal,3,35,28,1,6,95
+26,Jute Bags,Natural Fiber,3,25,35,9,2,85
+27,Cotton Packaging,Natural Fiber,2,10,20,9,4,80
+28,Hemp Fiber,Natural Fiber,3,20,25,9,2,85
+29,Wool Insulation Packaging,Animal Fiber,2,8,22,8,3,70
+30,Cork Packaging,Wood-based,2,7,18,9,2,75
+31,Wood Crates,Wood-based,3,50,60,8,5,70
+32,Plywood Boxes,Wood-based,3,40,55,7,6,65
+33,Recycled Wood Fiber,Wood-based,2,15,20,8,4,75
+34,Newspaper Wrap,Paper-based,1,2,2,9,2,95
+35,Grass Fiber Packaging,Plant-based,2,6,8,9,2,80
+36,Algae-based Film,Marine-based,1,1,15,10,1,50
+37,Chitosan Film,Bio-polymer,1,2,18,9,2,60
+38,Natural Rubber Packaging,Bio-elastic,3,10,28,8,3,70
+39,Soy-based Foam,Bio-foam,2,6,16,9,3,65
+40,Coconut Coir,Plant-based,2,8,10,9,2,75
+41,Linen Fiber Packaging,Natural Fiber,2,10,22,9,3,80
+42,Recycled Textile Fiber,Recycled Fiber,2,12,18,7,4,70
+43,Paper Honeycomb,Paper-based,3,25,20,9,3,95
+44,Mycelium Foam,Bio-composite,3,15,27,10,1,90
+45,Water-Soluble Pouches,Bio-polymer,1,1,12,10,2,50
+46,Clay-based Packaging,Mineral-based,2,10,15,2,5,40
+47,Straw Bale Packaging,Agricultural Waste,3,30,18,10,1,60
+48,Recycled Paperboard,Paper-based,2,10,12,9,3,95
+49,Biodegradable Foam Peanuts,Bio-foam,1,3,8,10,2,70
+50,Natural Latex Wrap,Bio-elastic,2,5,20,8,3,65
