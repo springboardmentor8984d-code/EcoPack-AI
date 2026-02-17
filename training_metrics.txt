@@ -1,0 +1,9 @@
+--- Cost Prediction Model (Random Forest) ---
+RMSE: 0.2525
+MAE: 0.1983
+R2 Score: 0.9242
+
+--- CO2 Footprint Prediction Model (XGBoost) ---
+RMSE: 8.9462
+MAE: 4.8313
+R2 Score: 0.8745

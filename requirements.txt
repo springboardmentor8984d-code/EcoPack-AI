@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+xgboost
+flask
+flask-sqlalchemy
+joblib
+matplotlib
+plotly
+pypdf
