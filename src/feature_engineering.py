@@ -1,17 +1,14 @@
+import sqlite3
 import pandas as pd
 import numpy as np
 import os
-from sqlalchemy import text
-from db_utils import get_db_engine
 
-def perform_feature_engineering():
+def perform_feature_engineering(db_path):
     """
     Read data from the DB, perform feature engineering, and update the DB.
     """
-    engine = get_db_engine()
-    
-    with engine.connect() as conn:
-        df = pd.read_sql_query(text("SELECT * FROM raw_materials"), conn)
+    conn = sqlite3.connect(db_path)
+    df = pd.read_sql_query("SELECT * FROM raw_materials", conn)
 
     # 1. CO2 Impact Index (Lower is better)
     df['CO2_Impact_Index'] = df['CO2_Emission_Score'] * (100 - df['Biodegradability_Score']) / 100
@@ -35,9 +32,11 @@ def perform_feature_engineering():
     df = df.sort_values('final_score')
     df['Material_Rank'] = range(1, len(df) + 1)
 
-    with engine.begin() as conn:
-        df.to_sql('materials_processed', conn, if_exists='replace', index=False)
+    df.to_sql('materials_processed', conn, if_exists='replace', index=False)
     print("Ranking evaluation completed. Processed data saved.")
+    conn.close()
 
 if __name__ == "__main__":
-    perform_feature_engineering()
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DB_FILE = os.path.join(BASE_DIR, 'data', 'ecopack.db')
+    perform_feature_engineering(DB_FILE)

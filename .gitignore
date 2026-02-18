@@ -22,8 +22,9 @@ wheels/
 *.egg
 
 # Data & Database
-*.db
+# *.db  <-- Un-commenting to allow ecopack.db for Vercel
 *.sqlite3
+!data/ecopack.db
 
 # ML Models
 models/*.pkl

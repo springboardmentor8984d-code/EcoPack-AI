@@ -3,17 +3,16 @@ import pandas as pd
 import os
 import numpy as np
 import onnxruntime as ort
-from db_utils import get_db_engine
-from sqlalchemy import text
+import sqlite3
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 # Configuration
-MODELS_DIR = os.path.join(os.path.dirname(__file__), '..', 'models')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, '..', 'data', 'ecopack.db')
+MODELS_DIR = os.path.join(BASE_DIR, '..', 'models')
 
-# Load models (ONNX)
-# We use ONNX Runtime for inference to reduce deployment size
-# Check if models exist before loading to avoid immediate crash if not present (though they should be)
+# Load models (ONNX) - Lightweight for Vercel
 try:
     cost_session = ort.InferenceSession(os.path.join(MODELS_DIR, 'cost_model.onnx'))
     co2_session = ort.InferenceSession(os.path.join(MODELS_DIR, 'co2_model.onnx'))
@@ -22,7 +21,7 @@ except Exception as e:
     cost_session = None
     co2_session = None
 
-# Hardcoded features to avoid dependency on external pkl file
+# Hardcoded features
 features = ['Strength_MPa', 'Weight_Capacity_kg', 'Biodegradability_Score', 'Recyclability_Percentage']
 
 @app.route('/')
@@ -31,9 +30,11 @@ def index():
 
 @app.route('/api/materials', methods=['GET'])
 def get_materials():
-    engine = get_db_engine()
-    with engine.connect() as conn:
-        df = pd.read_sql_query(text("SELECT * FROM materials_processed"), conn)
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        df = pd.read_sql_query("SELECT * FROM materials_processed", conn)
+    finally:
+        conn.close()
     return jsonify(df.to_dict(orient='records'))
 
 @app.route('/api/recommend', methods=['POST'])
@@ -48,9 +49,11 @@ def recommend():
     shipping = data.get('shipping_type', 'domestic')
     sustainability_priority = data.get('sustainability_priority', 'medium')
     
-    engine = get_db_engine()
-    with engine.connect() as conn:
-        df = pd.read_sql_query(text("SELECT * FROM materials_processed"), conn)
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        df = pd.read_sql_query("SELECT * FROM materials_processed", conn)
+    finally:
+        conn.close()
 
     # --- 1. ACTION: FILTERING (Constraint Handling) ---
     df = df[df["Strength_MPa"] >= strength_req]
@@ -114,9 +117,11 @@ def recommend():
 
 @app.route('/api/analytics', methods=['GET'])
 def get_analytics():
-    engine = get_db_engine()
-    with engine.connect() as conn:
-        df = pd.read_sql_query(text("SELECT * FROM materials_processed"), conn)
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        df = pd.read_sql_query("SELECT * FROM materials_processed", conn)
+    finally:
+        conn.close()
     
     # Simple aggregations for BI dashboard
     avg_co2 = df['CO2_Impact_Index'].mean()
@@ -133,25 +138,26 @@ def get_analytics():
 
 @app.route('/db-view')
 def view_db():
-    engine = get_db_engine()
-    with engine.connect() as conn:
-        try:
-            df = pd.read_sql_query(text("SELECT * FROM materials_processed LIMIT 100"), conn)
-            table_html = df.to_html(classes='table table-striped', index=False)
-            return f"""
-            <html>
-                <head>
-                    <title>Database View</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                </head>
-                <body class="container mt-5">
-                    <h1>Materials Processed (Top 100)</h1>
-                    {table_html}
-                </body>
-            </html>
-            """
-        except Exception as e:
-            return f"Error reading database: {e}"
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        df = pd.read_sql_query("SELECT * FROM materials_processed LIMIT 100", conn)
+        conn.close()
+        
+        table_html = df.to_html(classes='table table-striped', index=False)
+        return f"""
+        <html>
+            <head>
+                <title>Database View</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            </head>
+            <body class="container mt-5">
+                <h1>Materials Processed (Top 100)</h1>
+                {table_html}
+            </body>
+        </html>
+        """
+    except Exception as e:
+        return f"Error reading database: {e}. Path: {DB_PATH}"
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

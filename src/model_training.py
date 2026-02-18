@@ -1,21 +1,19 @@
 import pandas as pd
+import sqlite3
 import os
 import joblib
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import numpy as np
-from sqlalchemy import text
-from db_utils import get_db_engine
 
-def train_models(models_dir):
+def train_models(db_path, models_dir):
     """
     Train ML models using data from the DB.
     """
-    engine = get_db_engine()
-    
-    with engine.connect() as conn:
-        df = pd.read_sql_query(text("SELECT * FROM materials_processed"), conn)
+    conn = sqlite3.connect(db_path)
+    df = pd.read_sql_query("SELECT * FROM materials_processed", conn)
+    conn.close()
 
     if df.empty:
         print("Error: No data in materials_processed table.")
@@ -55,5 +53,6 @@ def train_models(models_dir):
 
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DB_FILE = os.path.join(BASE_DIR, 'data', 'ecopack.db')
     MODELS_DIR = os.path.join(BASE_DIR, 'models')
-    train_models(MODELS_DIR)
+    train_models(DB_FILE, MODELS_DIR)
