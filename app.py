@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, send_file
 import pandas as pd
 import numpy as np
-import psycopg2
 import joblib
 import os
 import io
@@ -12,7 +11,6 @@ from reportlab.lib.pagesizes import A4
 from openpyxl import Workbook
 
 app = Flask(__name__)
-df = pd.read_csv("packaging_materials.csv")
 
 # ---------------- GLOBAL STORAGE ----------------
 LAST_RECOMMENDATIONS = []
@@ -22,15 +20,6 @@ LAST_METRICS = {}
 cost_model = joblib.load("cost_model.pkl")
 co2_model = joblib.load("co2_model.pkl")
 scaler = joblib.load("scaler.pkl")
-
-# ---------------- DATABASE CONNECTION ----------------
-#def get_db_connection():
-#    return psycopg2.connect(
- #       host="localhost",
-  #      database="ecopackai",
-   #     user="postgres",
-    #    password="Teja@750"
-    #)
 
 STRENGTH_MAP = {"Low": 1, "Medium": 2, "High": 3}
 
@@ -50,26 +39,13 @@ def recommend():
         weight = float(data.get("weight"))
         fragility = data.get("fragility")
 
-        conn = get_db_connection()
+        # ---- CSV DATA SOURCE (DEPLOYMENT SAFE) ----
+        df = pd.read_csv("packaging_materials.csv")
 
-        query = """
-        SELECT material_type,
-               strength,
-               weight_capacity_kg,
-               cost_per_unit,
-               co2_emission_score,
-               recyclability_percentage,
-               biodegradability_score
-        FROM packaging_materials
-        """
-
-        df = pd.read_sql(query, conn)
-        conn.close()
-
-        # Convert strength to numeric
+        # Strength numeric
         df["strength_num"] = df["strength"].map(STRENGTH_MAP).fillna(1)
 
-        # Fragility filtering
+        # Fragility filter
         if fragility == "High":
             df = df[df["strength_num"] == 3]
         elif fragility == "Medium":
@@ -79,7 +55,7 @@ def recommend():
 
         for _, row in df.iterrows():
 
-            # -------- ML INPUT (EXACT TRAINING FORMAT) --------
+            # ---- ML INPUT (TRAINING FORMAT) ----
             model_input = pd.DataFrame([{
                 "strength": row["strength_num"],
                 "Weight_Capacity_kg": weight,
@@ -92,9 +68,8 @@ def recommend():
             pred_cost = float(cost_model.predict(scaled)[0])
             pred_co2 = float(co2_model.predict(scaled)[0])
 
-            # ================= HYBRID RANKING ENGINE =================
+            # -------- HYBRID AI SCORING ENGINE --------
 
-            # Material intelligence scores
             eco_score = (
                 (row["recyclability_percentage"] * 0.4) +
                 (row["biodegradability_score"] * 0.3)
@@ -102,16 +77,13 @@ def recommend():
 
             strength_score = row["strength_num"] * 10
             cost_score = max(0, 10 - row["cost_per_unit"]) * 5
-
-            # ML intelligence
             ml_score = max(0, 10 - pred_co2) * 10
 
-            # Final suitability (HYBRID AI)
             suitability = round(
-                (ml_score * 0.4) +        # ML influence
-                (eco_score * 0.3) +       # sustainability
-                (strength_score * 0.2) +  # strength logic
-                (cost_score * 0.1),       # cost logic
+                (ml_score * 0.4) +
+                (eco_score * 0.3) +
+                (strength_score * 0.2) +
+                (cost_score * 0.1),
                 2
             )
 
@@ -129,7 +101,6 @@ def recommend():
             reverse=True
         )[:5]
 
-        # BI Metrics
         best = top_recs[0]
 
         cost_savings = round(max(0, 10.0 - best["cost"]), 2)
@@ -223,6 +194,7 @@ def download_excel():
     )
 
 
-# ---------------- RUN ----------------
+# ---------------- RUN (RENDER SAFE) ----------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
