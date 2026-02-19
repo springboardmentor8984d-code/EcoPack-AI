@@ -6,3 +6,5 @@ joblib
 reportlab
 openpyxl
 gunicorn
+scikit-learn
+
