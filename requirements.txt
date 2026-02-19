@@ -1,0 +1,8 @@
+flask
+pandas
+numpy
+psycopg2-binary
+joblib
+reportlab
+openpyxl
+gunicorn

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Material Details</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>{{ material[0] }}</h1>
+
+    <div class="card">
+
+        <p><strong>Strength:</strong> {{ material[1] }}</p>
+        <p><strong>Weight Capacity:</strong> {{ material[2] }} kg</p>
+        <p><strong>Cost Per Unit:</strong> ₹{{ material[3] }}</p>
+        <p><strong>Recyclability:</strong> {{ material[6] }}%</p>
+        <p><strong>CO₂ Index:</strong> {{ material[7] }}</p>
+
+    </div>
+
+    <a href="/" class="back-btn">← Back to Dashboard</a>
+
+</div>
+
+<footer>
+    <p>© 2026 EcoPackAI | Internship Project</p>
+</footer>
+
+</body>
+</html>
+
