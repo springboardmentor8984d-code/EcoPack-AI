@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EcoPackAI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #1f3c88, #39a0ed);
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            margin: 30px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .form-section select, .form-section button {
+            padding: 10px;
+            margin: 10px 10px 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #1f3c88;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #16306b;
+        }
+
+        .metrics {
+            display: flex;
+            gap: 20px;
+        }
+
+        .metric-box {
+            flex: 1;
+            background: #f4f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-box h2 {
+            margin: 10px 0;
+            color: #1f3c88;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #1f3c88;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>EcoPackAI – Sustainable Packaging Dashboard</h1>
+
+    <div class="card form-section">
+        <h3>Recommendation Selection</h3>
+
+        <select id="product_category" required>
+            <option value="">Product Category</option>
+            <option value="food">Food</option>
+            <option value="electronics">Electronics</option>
+            <option value="cosmetics">Cosmetics</option>
+        </select>
+
+        <select id="fragility" required>
+            <option value="">Fragility</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+
+        <select id="shipping_type" required>
+            <option value="">Shipping Type</option>
+            <option value="domestic">Domestic</option>
+            <option value="international">International</option>
+        </select>
+
+        <select id="sustainability_priority" required>
+            <option value="">Sustainability Priority</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+
+        <button onclick="getRecommendations()">Generate Recommendation</button>
+    </div>
+
+    <div id="dashboard"></div>
+
+</div>
+
+<script>
+
+async function getRecommendations() {
+
+    const data = {
+        product_category: document.getElementById("product_category").value,
+        fragility: document.getElementById("fragility").value,
+        shipping_type: document.getElementById("shipping_type").value,
+        sustainability_priority: document.getElementById("sustainability_priority").value
+    };
+
+    const response = await fetch("/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    let top = result.recommended_materials[0];
+
+    let html = `
+        <div class="card">
+            <h3>Performance Metrics</h3>
+            <div class="metrics">
+                <div class="metric-box">
+                    <h4>CO₂ Reduction</h4>
+                    <h2>${top.co2_reduction.toFixed(2)} %</h2>
+                </div>
+                <div class="metric-box">
+                    <h4>Cost Savings</h4>
+                    <h2>₹ ${top.cost_savings.toFixed(2)}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Top Recommended Materials</h3>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Material</th>
+                    <th>Cost</th>
+                    <th>CO₂</th>
+                    <th>Suitability Score</th>
+                </tr>
+    `;
+
+    result.recommended_materials.forEach((item, index) => {
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.material}</td>
+                <td>${item.cost.toFixed(2)}</td>
+                <td>${item.co2.toFixed(2)}</td>
+                <td>${item.score.toFixed(3)}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </table>
+        </div>
+    `;
+
+    document.getElementById("dashboard").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
