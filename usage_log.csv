@@ -1,0 +1,22 @@
+timestamp,material_name,category,shipping,sustainability
+2026-02-20T07:04:06.702747,kraft paper,Food,Domestic,Medium
+2026-02-20T07:11:03.957990,kraft paper,Food,Domestic,Medium
+2026-02-20T07:11:15.567184,kraft paper,Cosmetics,Domestic,Medium
+2026-02-20T07:11:21.736188,kraft paper,Cosmetics,Domestic,Medium
+2026-02-20T07:16:35.899423,kraft paper,Food,Domestic,Medium
+2026-02-20T07:16:35.933883,metal,Industrial Parts,Domestic,Medium
+2026-02-20T07:17:48.470223,kraft paper,Pharmaceuticals,Domestic,Medium
+2026-02-20T07:17:58.909604,metal,Industrial Parts,Domestic,Medium
+2026-02-20T07:18:09.407730,kraft paper,Food,Domestic,Medium
+2026-02-20T07:18:30.531393,sugarcane bagasse,Electronics,Domestic,Medium
+2026-02-20T07:18:51.230770,hemp fiber,Electronics,Domestic,Medium
+2026-02-20T07:19:04.270510,hemp fiber,Food,Domestic,Medium
+2026-02-20T07:19:20.035754,hemp fiber,Pharmaceuticals,Domestic,Medium
+2026-02-20T07:19:21.987260,hemp fiber,Pharmaceuticals,Domestic,Medium
+2026-02-20T07:19:26.550157,molded pulp,Pharmaceuticals,Domestic,Medium
+2026-02-20T07:19:47.059306,molded pulp,Pharmaceuticals,Domestic,Low
+2026-02-20T07:19:52.450348,molded pulp,Pharmaceuticals,Domestic,High
+2026-02-20T07:21:25.860435,sugarcane bagasse,Electronics,Domestic,High
+2026-02-20T07:21:42.244156,hemp fiber,Electronics,Domestic,High
+2026-02-20T07:21:57.497034,hemp fiber,Food,Domestic,High
+2026-02-20T07:22:10.241835,molded pulp,Food,Domestic,High
