@@ -1,138 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EcoPackAI - Sustainable Packaging & BI Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPackAI | Sustainable Packaging Optimization</title>
+    <meta name="description"
+        content="AI-powered framework for sustainable packaging design and material optimization. Reduce CO2 footprint and costs with intelligent recommendations.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --accent: #20e3b2;
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark);
+            color: #e2e8f0;
+            margin: 0;
+            overflow-x: hidden;
+        }
 
-  <!-- Link to external CSS -->
- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        .hero-section {
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            padding: 80px 0;
+            text-align: center;
+        }
 
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+            transform: scale(1.05);
+        }
+
+        .stats-badge {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(32, 227, 178, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(32, 227, 178, 0.2);
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: none;
+        }
+
+        .recommendation-table th {
+            color: var(--primary);
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        .recommendation-table td {
+            border-bottom: 1px solid var(--glass-border);
+            vertical-align: middle;
+        }
+
+        #analytics-dashboard {
+            margin-top: 50px;
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1>EcoPackAI – Smart & Sustainable Packaging</h1>
-
-  <!-- Form -->
-  <div class="card">
-    <form id="productForm">
-      <div class="form-group">
-        <label for="product_category">Product Category *</label>
-        <select id="product_category" required>
-          <option value="">-- Select Category --</option>
-          <option value="food">Food</option>
-          <option value="beverages">Beverages</option>
-          <option value="pharmaceuticals">Pharmaceuticals</option>
-          <option value="agriculture">Agriculture</option>
-          <option value="electronics">Electronics</option>
-          <option value="automotive_parts">Automotive Parts</option>
-          <option value="construction_tools">Construction Tools</option>
-          <option value="industrial_chemicals">Industrial Chemicals</option>
-          <option value="cosmetics">Cosmetics</option>
-          <option value="apparel_fashion">Apparel & Fashion</option>
-          <option value="luxury_goods">Luxury Goods</option>
-          <option value="e_commerce_general">E-commerce General</option>
-          <option value="home_appliances">Home Appliances</option>
-          <option value="toys_baby_products">Toys & Baby Products</option>
-          <option value="office_supplies">Office Supplies</option>
-        </select>
-        <div class="error" id="err_category">Please select a category</div>
-      </div>
-
-      <div class="form-group">
-        <label>Fragility Level *</label>
-        <div class="radio-group">
-          <label><input type="radio" name="fragility" value="low" required> Low</label>
-          <label><input type="radio" name="fragility" value="medium"> Medium</label>
-          <label><input type="radio" name="fragility" value="high"> High</label>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent py-4">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <div
+                    style="width: 40px; height: 40px; background: linear-gradient(45deg, var(--primary), var(--accent)); border-radius: 10px; margin-right: 15px;">
+                </div>
+                <span style="font-size: 1.5rem; letter-spacing: 1px;">EcoPack<span
+                        class="fw-bold text-accent">AI</span></span>
+            </a>
         </div>
-        <div class="error" id="err_fragility">Please select fragility level</div>
-      </div>
+    </nav>
 
-      <div class="form-group">
-        <label for="weight">Approximate Weight (kg) *</label>
-        <input type="number" id="weight" min="0.01" step="0.01" required placeholder="e.g. 2.5">
-        <div class="error" id="err_weight">Please enter a valid weight</div>
-      </div>
-
-      <div class="form-group">
-        <label>Shipping Type *</label>
-        <div class="radio-group">
-          <label><input type="radio" name="Shipping_Type" value="domestic" required> Domestic</label>
-          <label><input type="radio" name="Shipping_Type" value="international"> International</label>
+    <div class="container py-5">
+        <div class="row align-items-center mb-5 hero-section">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-4 mb-3">Optimize Packaging for the Circular Economy</h1>
+                <p class="lead text-secondary opacity-75">AI-driven framework to minimize CO2 footprint, maximize
+                    biodegradability, and reduce costs through intelligent material selection.</p>
+            </div>
         </div>
-        <div class="error" id="err_shipping">Please select shipping type</div>
-      </div>
 
-      <div class="form-group">
-        <label>Sustainability Priority *</label>
-        <div class="radio-group">
-          <label><input type="radio" name="Sustainability_Priority" value="high" required> High</label>
-          <label><input type="radio" name="Sustainability_Priority" value="medium"> Medium</label>
-          <label><input type="radio" name="Sustainability_Priority" value="low"> Low</label>
+        <div class="row g-4">
+            <!-- Input Form Section -->
+            <div class="col-lg-5">
+                <div class="glass-card">
+                    <h3 class="mb-4">Product Attributes</h3>
+                    <form id="recommendation-form">
+                        <div class="mb-3">
+                            <label class="form-label">Min. Required Strength (MPa)</label>
+                            <input type="number" class="form-control" id="strength" value="10">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Min. Weight Capacity (kg)</label>
+                            <input type="number" class="form-control" id="weight_capacity" value="5">
+                        </div>
+                        <hr class="my-4 opacity-10">
+                        <div class="mb-3">
+                            <label class="form-label">Product Category</label>
+                            <select class="form-select" id="product_category">
+                                <option value="food">Food & Beverage</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="cosmetics">Cosmetics</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fragility</label>
+                            <select class="form-select" id="fragility">
+                                <option value="low">Low (Hard items)</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High (Glass/Fine Art)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Shipping Type</label>
+                            <select class="form-select" id="shipping_type">
+                                <option value="domestic">Domestic</option>
+                                <option value="national">National</option>
+                                <option value="international">International</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sustainability Priority</label>
+                            <select class="form-select" id="sustainability_priority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High (Zero Waste)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-gradient w-100 mt-3">Generate ML Recommendations</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="col-lg-7">
+                <div class="glass-card h-100">
+                    <h3 class="mb-4">Top Material Recommendations</h3>
+                    <div class="table-responsive">
+                        <table class="table table-dark recommendation-table" id="recommendations-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Material</th>
+                                    <th>CO2 Impact</th>
+                                    <th>Evaluation Score</th>
+                                    <th>Cost/Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data populated by JS -->
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 opacity-50">Enter product parameters to see
+                                        results</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="error" id="err_priority">Please select priority</div>
-      </div>
 
-      <div style="text-align:center; margin-top:3rem;">
-        <button type="submit" id="submitBtn">Get Recommendations</button>
-      </div>
-    </form>
-  </div>
+        <!-- BI Dashboard Section -->
+        <div id="analytics-dashboard" class="row g-4 pb-5">
+            <div class="col-12">
+                <h2 class="mb-4">Sustainability Intelligence & Ranking</h2>
+            </div>
 
-  <!-- Results + Export -->
-  <div class="card" id="results-section">
-    <h2>Your Recommended Materials</h2>
-    <div class="loading" id="loading">Finding the best eco-packaging options...</div>
-    <div id="resultsTable"></div>
+            <div class="col-md-4">
+                <div class="glass-card text-center p-4">
+                    <p class="text-secondary mb-1">Average CO2 Reduction</p>
+                    <h2 id="stats-co2" class="display-6">--</h2>
+                    <span class="stats-badge mt-2">Target reached: 28%</span>
+                </div>
+            </div>
 
-    <div class="export-buttons">
-      <button onclick="exportToCSV()">Export Ranking to Excel/CSV</button>
-      <button onclick="exportToPDF()">Export Summary Report (Print/PDF)</button>
+            <div class="col-md-4">
+                <div class="glass-card text-center p-4">
+                    <p class="text-secondary mb-1">Cost Optimization Rate</p>
+                    <h2 id="stats-cost" class="display-6">--</h2>
+                    <span class="stats-badge mt-2">Potential Savings</span>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="glass-card text-center p-4">
+                    <p class="text-secondary mb-1">Eco-Compliance Index</p>
+                    <h2 id="stats-compliance" class="display-6">High</h2>
+                    <span class="stats-badge mt-2">Certified Grade A</span>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="glass-card">
+                    <h5 class="mb-4 text-center">Top Rated Eco-Materials by Suitability Score</h5>
+                    <div style="max-width: 500px; margin: 0 auto;">
+                        <canvas id="suitabilityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Dashboard -->
-  <div class="card" id="dashboard-section">
-    <h2>Packaging Insights Dashboard</h2>
+    <footer class="py-5 text-center opacity-50">
+        <p>&copy; 2026 EcoPackAI Framework. Implementation for Sustainable Packaging.</p>
+    </footer>
 
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-label">Average CO₂ Reduction</div>
-        <div class="metric-value" id="co2Reduction" style="color: var(--success);">— %</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Estimated Cost Savings</div>
-        <div class="metric-value" id="costSavings" style="color: var(--warning);">₹ —</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Total Recommendations</div>
-        <div class="metric-value" id="totalRecs" style="color: var(--info);">0</div>
-      </div>
-    </div>
+    <script>
+        document.getElementById('recommendation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    <div class="charts-grid">
-      <div class="chart-container">
-        <canvas id="materialUsageBar"></canvas>
-      </div>
-      <div class="chart-container">
-        <canvas id="materialPie"></canvas>
-      </div>
-      <div class="chart-container">
-        <canvas id="rankingHorizontalBar"></canvas>
-      </div>
-      <div class="chart-container">
-        <canvas id="trendsLine"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
+            const data = {
+                strength: document.getElementById('strength').value,
+                weight_capacity: document.getElementById('weight_capacity').value,
+                product_category: document.getElementById('product_category').value,
+                fragility: document.getElementById('fragility').value,
+                shipping_type: document.getElementById('shipping_type').value,
+                sustainability_priority: document.getElementById('sustainability_priority').value
+            };
 
-<!-- Link to external JavaScript -->
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+            const response = await fetch('/api/recommend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const results = await response.json();
+            const tbody = document.querySelector('#recommendations-table tbody');
+            tbody.innerHTML = '';
+
+            if (results.message) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">${results.message}</td></tr>`;
+                return;
+            }
+
+            results.recommended_materials.forEach((item, index) => {
+                const displayScore = (item.suitability_score * 100).toFixed(0);
+                const row = `
+                    <tr>
+                        <td><span class="badge rounded-circle bg-primary" style="width: 25px; height: 25px; display: inline-block;">${index + 1}</span></td>
+                        <td><strong>${item.material}</strong></td>
+                        <td><span class="text-accent">${item.predicted_co2.toFixed(2)}</span></td>
+                        <td>
+                            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1);">
+                                <div class="progress-bar bg-accent" role="progressbar" style="width: ${displayScore}%"></div>
+                            </div>
+                            <small class="opacity-50" style="font-size: 0.7rem;">Suitability: ${displayScore}%</small>
+                        </td>
+                        <td>$${item.predicted_cost.toFixed(2)}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        });
+
+        async function loadAnalytics() {
+            const response = await fetch('/api/analytics');
+            const data = await response.json();
+
+            document.getElementById('stats-co2').innerText = data.avg_co2.toFixed(1);
+            document.getElementById('stats-cost').innerText = '$' + data.avg_cost.toFixed(2);
+
+            // Render Chart
+            new Chart(document.getElementById('suitabilityChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.top_materials.map(m => m.Material_Type),
+                    datasets: [{
+                        data: data.top_materials.map(m => m.Material_Suitability_Score),
+                        backgroundColor: [
+                            '#20e3b2', '#00f2fe', '#4facfe', '#7c3aed', '#ec4899'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } }
+                }
+            });
+        }
+
+        loadAnalytics();
+    </script>
 </body>
+
 </html>

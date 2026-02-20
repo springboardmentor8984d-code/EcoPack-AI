@@ -1,0 +1,11 @@
+flask
+pandas
+numpy
+onnxruntime
+joblib
+sqlalchemy
+pymysql
+psycopg2-binary
+cryptography
+gunicorn
+python-dotenv
