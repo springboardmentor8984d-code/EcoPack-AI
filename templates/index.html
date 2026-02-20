@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EcoPackAI | Sustainable Intelligence</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <h1 class="main-title">🌱 EcoPackAI Dashboard</h1>
+    <p class="subtitle">AI-Powered Sustainable Packaging Intelligence System</p>
+
+    <!-- ================= INPUT SECTION ================= -->
+    <div class="card">
+
+        <h2 class="card-title">📦 Product Details</h2>
+
+        <div class="input-grid">
+
+            <div class="input-group">
+                <label>Product Category</label>
+                <select id="category">
+                    <option>Electronics</option>
+                    <option>Food</option>
+                    <option>Cosmetics</option>
+                    <option>Furniture</option>
+                    <option>Pharmaceutical</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Weight (kg)</label>
+                <input type="number" id="weight" placeholder="Enter weight">
+            </div>
+
+            <div class="input-group">
+                <label>Fragility Level</label>
+                <select id="fragility">
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Shipping Method</label>
+                <select id="shipping">
+                    <option>Road</option>
+                    <option>Air</option>
+                    <option>Sea</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Distance (km)</label>
+                <input type="number" id="distance" placeholder="Enter distance">
+            </div>
+
+            <div class="input-group">
+                <label>Quantity</label>
+                <input type="number" id="quantity" placeholder="Enter quantity">
+            </div>
+
+        </div>
+
+        <div class="btn-center">
+            <button class="generate-btn" onclick="getRecommendation()">
+                🚀 Generate Recommendations
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ================= DASHBOARD ================= -->
+    <div id="dashboard" class="hidden">
+
+        <!-- METRICS -->
+        <div class="metrics">
+
+            <div class="metric-box cost">
+                <h3>💰 Estimated Cost</h3>
+                <p id="saveVal">₹0</p>
+            </div>
+
+            <div class="metric-box co2">
+                <h3>🌍 Estimated CO₂ Impact</h3>
+                <p id="co2Val">0</p>
+            </div>
+
+        </div>
+
+        <!-- RECOMMENDATIONS -->
+        <h2 class="section-heading">🏆 Top 5 Material Recommendations</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Material</th>
+                        <th>Cost (₹)</th>
+                        <th>CO₂ Score</th>
+                        <th>Suitability (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- CHART -->
+        <h2 class="section-heading">📊 Suitability Comparison Chart</h2>
+
+        <div class="chart-box">
+            <canvas id="suitabilityChart"></canvas>
+        </div>
+
+        <!-- DOWNLOAD SECTION -->
+        <div class="download-section">
+            <button onclick="window.location.href='/download_pdf'">
+                📄 Download PDF Report
+            </button>
+
+            <button onclick="window.location.href='/download_excel'">
+                📊 Download Excel Report
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
+

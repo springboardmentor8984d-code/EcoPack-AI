@@ -1,0 +1,195 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #eef2f3, #dfe9f3);
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+/* TITLE */
+.main-title {
+    text-align: center;
+    font-size: 34px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 40px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin-bottom: 50px;
+}
+
+.card-title {
+    margin-bottom: 20px;
+    color: #34495e;
+}
+
+/* INPUT GRID */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.input-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #27ae60;
+    outline: none;
+}
+
+/* BUTTON */
+.btn-center {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.generate-btn {
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.generate-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* DASHBOARD */
+.hidden {
+    display: none;
+}
+
+/* METRICS */
+.metrics {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.metric-box {
+    flex: 1;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+.metric-box p {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.metric-box.cost {
+    border-left: 6px solid #27ae60;
+}
+
+.metric-box.co2 {
+    border-left: 6px solid #2980b9;
+}
+
+/* SECTION HEADINGS */
+.section-heading {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* TABLE */
+.table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 50px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th {
+    background: #2c3e50;
+    color: white;
+    padding: 14px;
+}
+
+td {
+    padding: 14px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background: #f9f9f9;
+}
+
+/* CHART */
+.chart-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    height: 400px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    margin-bottom: 40px;
+}
+
+/* DOWNLOAD */
+.download-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.download-section button {
+    padding: 12px 25px;
+    margin: 0 15px;
+    border-radius: 25px;
+    border: none;
+    background: linear-gradient(45deg, #34495e, #2c3e50);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.download-section button:hover {
+    transform: scale(1.05);
+}
+.hidden {
+    display: none;
+}
+
