@@ -45,10 +45,23 @@ def train_models(db_path, models_dir):
     joblib.dump(features, os.path.join(models_dir, 'features.pkl'))
     
     metrics_file = os.path.join(os.path.dirname(models_dir), 'training_metrics.txt')
+    
+    cost_rmse = np.sqrt(mean_squared_error(y_test, y_pred_cost))
+    cost_r2 = r2_score(y_test, y_pred_cost)
+    
+    co2_rmse = np.sqrt(mean_squared_error(y_test_co2, y_pred_co2))
+    co2_r2 = r2_score(y_test_co2, y_pred_co2)
+    
     with open(metrics_file, 'w') as f:
-        f.write(f"Cost RMSE: {np.sqrt(mean_squared_error(y_test, y_pred_cost)):.4f}\n")
-        f.write(f"CO2 RMSE: {np.sqrt(mean_squared_error(y_test_co2, y_pred_co2)):.4f}\n")
+        f.write(f"Cost RMSE: {cost_rmse:.4f}\n")
+        f.write(f"Cost R2 Score: {cost_r2:.4f}\n")
+        f.write(f"CO2 RMSE: {co2_rmse:.4f}\n")
+        f.write(f"CO2 R2 Score: {co2_r2:.4f}\n")
 
+    print("-" * 30)
+    print(f"Cost R2 Score: {cost_r2:.4f}")
+    print(f"CO2 R2 Score:  {co2_r2:.4f}")
+    print("-" * 30)
     print(f"Models saved. Metrics at: {metrics_file}")
 
 if __name__ == "__main__":

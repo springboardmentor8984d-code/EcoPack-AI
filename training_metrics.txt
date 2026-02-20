@@ -1,2 +1,4 @@
 Cost RMSE: 0.1798
+Cost R2 Score: 0.9645
 CO2 RMSE: 3.9983
+CO2 R2 Score: 0.9690
