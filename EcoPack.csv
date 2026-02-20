@@ -1,0 +1,47 @@
+material_name,strength,weight_capacity_kg,cost_per_unit,biodegradability_score,co2_emission_score,recyclability_percent
+Corrugated Cardboard,2,12,2,8,3,85
+Corrugated Cardboard,2,14,2,8,3,88
+Corrugated Cardboard,3,16,3,7,4,80
+Kraft Paper,1,5,1,9,2,90
+Kraft Paper,1,6,1,9,2,92
+Kraft Paper,2,7,2,8,3,88
+Molded Pulp,2,10,3,9,3,88
+Molded Pulp,2,11,3,9,2,90
+Molded Pulp,3,13,3,8,3,85
+Bamboo Fiber,3,18,5,9,3,80
+Bamboo Fiber,3,20,5,9,3,78
+Bamboo Fiber,2,16,4,8,4,82
+Bagasse,2,10,2,9,2,85
+Bagasse,2,11,2,9,2,88
+Bagasse,3,13,3,8,3,80
+Honeycomb Paper,3,20,4,9,3,90
+Honeycomb Paper,3,22,4,9,3,92
+Honeycomb Paper,2,18,3,8,4,88
+Recycled Plastic,3,25,3,4,6,90
+Recycled Plastic,3,27,4,4,6,92
+Recycled Plastic,2,22,3,5,5,88
+Mushroom Packaging,2,10,4,10,1,95
+Mushroom Packaging,2,11,4,10,1,96
+Mushroom Packaging,3,13,5,9,2,92
+PLA Plastic,3,15,4,7,4,70
+PLA Plastic,3,17,4,7,4,72
+PLA Plastic,2,13,3,8,3,75
+Paper Foam,1,5,1,9,2,85
+Paper Foam,1,6,1,9,2,87
+Paper Foam,2,7,2,8,3,82
+Jute Fiber,3,20,5,8,4,75
+Jute Fiber,3,22,5,8,4,78
+Jute Fiber,2,18,4,9,3,80
+Hemp Fiber,3,22,5,9,3,82
+Hemp Fiber,3,24,5,9,3,85
+Cork Packaging,2,16,4,8,3,75
+Cork Packaging,2,18,4,8,3,78
+Cork Packaging,3,20,5,7,4,72
+Recycled PET,3,24,4,4,6,92
+Recycled PET,3,26,4,4,6,94
+Recycled PET,2,22,3,5,5,90
+Agro-Waste Composite,3,23,4,8,3,80
+Agro-Waste Composite,3,25,5,8,3,82
+Agro-Waste Composite,2,21,4,9,2,85
+Paper Tube,2,12,2,8,3,85
+Paper Tube,2,14,2,8,3,88
