@@ -1,0 +1,57 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+
+
+# Environment Variables
+Backend/.env
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+.vscode/
+# Virtual environments
+venv/
+.env
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+# OS Files
+# OS
+.DS_Store
+Thumbs.db
+
+
+# VS Code
+.vscode/
+
+
+# Logs
+*.log
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+*.log
+.DS_Store
+.env
+__pycache__/
+*.pyc
