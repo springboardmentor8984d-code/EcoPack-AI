@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPack Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #2c3e50;
+            border-color: #2c3e50;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+
+        #results-section {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container py-5">
+        <h1 class="text-center mb-4">EcoPack Material Recommender</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <form id="recommendation-form">
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Product Category</label>
+                            <select class="form-select" id="category" required>
+                                <option value="Food">Food</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Cosmetics">Cosmetics</option>
+                                <option value="Pharmaceuticals">Pharmaceuticals</option>
+                                <option value="Fragile Goods">Fragile Goods</option>
+                                <option value="Textiles">Textiles</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Industrial Parts">Industrial Parts</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="fragility" class="form-label">Fragility Level</label>
+                                <select class="form-select" id="fragility">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="shipping" class="form-label">Shipping Type</label>
+                                <select class="form-select" id="shipping">
+                                    <option value="Domestic">Domestic</option>
+                                    <option value="International">International</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="sustainability" class="form-label">Sustainability Priority</label>
+                                <select class="form-select" id="sustainability">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="mt-5">
+            <h3 class="mb-3">Top Recommendations</h3>
+            <div class="row" id="results-container">
+                <!-- Cards will be injected here -->
+            </div>
+
+            <div class="row mt-5" id="savings-section">
+                <div class="col-md-6">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h5>CO2 Reduction</h5>
+                            <h2 id="co2-reduction">0%</h2>
+                            <p>Compared to plastic baseline</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5>Cost Savings</h5>
+                            <h2 id="cost-savings">$0.00</h2>
+                            <p>Per 1000 units vs baseline</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <canvas id="costChart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <canvas id="co2Chart"></canvas>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-center">Material Usage Trends</h5>
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('recommendation-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = {
+                product_category: document.getElementById('category').value,
+                fragility: document.getElementById('fragility').value,
+                shipping_type: document.getElementById('shipping').value,
+                sustainability_priority: document.getElementById('sustainability').value
+            };
+
+            try {
+                const response = await fetch('/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) throw new Error('API Error');
+                const data = await response.json();
+
+                displayResults(data.recommendations, data.baseline);
+            } catch (error) {
+                alert('Error fetching recommendations: ' + error.message);
+            }
+        });
+
+        function displayResults(recommendations, baseline) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            // Process Data based on Rank
+            recommendations.forEach((item, index) => {
+                const card = `
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 ${index === 0 ? 'border-success' : ''}">
+                    <div class="card-header d-flex justify-content-between">
+                        <strong>#${index + 1} ${item.material_name}</strong>
+                        <span class="badge bg-${index === 0 ? 'success' : 'secondary'}">${item.suitability_score}% Suitability</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Predicted Cost:</strong> ${item.predicted_cost}</p>
+                        <p><strong>CO2 Emission:</strong> ${item.predicted_co2} units</p>
+                        <p><strong>Strength:</strong> ${item.strength}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+                container.innerHTML += card;
+            });
+
+            // Calculate & Display Savings (Top Recommendation vs Baseline)
+            if (recommendations.length > 0 && baseline) {
+                const top = recommendations[0];
+
+                // CO2 Reduction %: ((baseline - predicted) / baseline) * 100
+                let co2Red = ((baseline.co2 - top.predicted_co2) / baseline.co2) * 100;
+                document.getElementById('co2-reduction').innerText = co2Red.toFixed(1) + "%";
+
+                // Cost Savings: (baseline - predicted) * 1000 units
+                let costSav = (baseline.cost - top.predicted_cost) * 1000;
+                document.getElementById('cost-savings').innerText = costSav.toFixed(2);
+            }
+
+            document.getElementById('results-section').style.display = 'block';
+            renderCharts(recommendations);
+            updateUsageChart();
+        }
+
+        let costChartInstance = null;
+        let co2ChartInstance = null;
+        let usageChartInstance = null;
+
+        async function updateUsageChart() {
+            try {
+                const response = await fetch('/api/usage');
+                const usageData = await response.json();
+
+                const labels = Object.keys(usageData);
+                const counts = Object.values(usageData);
+
+                const ctxUsage = document.getElementById('usageChart').getContext('2d');
+                if (usageChartInstance) usageChartInstance.destroy();
+
+                usageChartInstance = new Chart(ctxUsage, {
+                    type: 'doughnut', // Pie/Doughnut good for distribution
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Recommendation Count',
+                            data: counts,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+                            ]
+                        }]
+                    }
+                });
+            } catch (e) {
+                console.error("Error fetching usage stats:", e);
+            }
+        }
+
+        function renderCharts(data) {
+            const labels = data.map(d => d.material_name);
+            const costs = data.map(d => d.predicted_cost);
+            const co2s = data.map(d => d.predicted_co2);
+
+            // Destroy existing charts if any
+            if (costChartInstance) costChartInstance.destroy();
+            if (co2ChartInstance) co2ChartInstance.destroy();
+
+            // Cost Chart
+            const ctxCost = document.getElementById('costChart').getContext('2d');
+            costChartInstance = new Chart(ctxCost, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Predicted Cost ($)',
+                        data: costs,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }]
+                }
+            });
+
+            // CO2 Chart
+            const ctxCo2 = document.getElementById('co2Chart').getContext('2d');
+            co2ChartInstance = new Chart(ctxCo2, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'CO2 Emission Score',
+                        data: co2s,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                    }]
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

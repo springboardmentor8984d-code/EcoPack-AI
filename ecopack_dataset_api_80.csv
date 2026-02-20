@@ -1,0 +1,21 @@
+material_id,material_Name,strength_score,weight_capacity_kg,cost_per_unit,biodegradability_score,co2_emission_score,recyclability_percent
+1,paper,45,15,0.75,8,4.8,85
+2,plastic,75,18,1.40,1,9.5,30
+3,molded pulp,40,16,0.95,7,5.2,90
+4,glass,70,20,1.85,0,10.2,88
+5,metal,85,25,2.30,0,11.8,92
+6,bamboo,65,19,1.50,9,5.5,84
+7,pla bioplastic,60,14,1.65,7,6.2,60
+8,jute,55,17,1.00,9,5.8,72
+9,kraft paper,50,13,0.85,9,4.5,91
+10,bagasse,48,16,0.80,8,4.9,88
+11,hemp fiber,62,18,1.55,10,5.4,90
+12,aluminum,90,28,2.50,0,12.5,93
+13,cardboard,47,14,0.78,8,4.7,86
+14,bioplastic,58,15,1.70,8,6.0,78
+15,recycled paper,42,12,0.70,9,4.2,94
+16,polyethylene,72,17,1.35,1,9.2,25
+17,sugarcane bagasse,52,15,0.82,9,4.6,87
+18,wood,68,21,1.80,6,7.5,65
+19,molded pulp,44,10,0.65,10,4.0,96
+20,thermocol,35,8,0.60,2,10.8,10
