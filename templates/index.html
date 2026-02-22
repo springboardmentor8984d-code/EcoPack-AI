@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<<<<<<< HEAD
+<html>
+<head>
+    <title>EcoPackAI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #1f3c88, #39a0ed);
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            margin: 30px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .form-section select, .form-section button {
+            padding: 10px;
+            margin: 10px 10px 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #1f3c88;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #16306b;
+        }
+
+        .metrics {
+            display: flex;
+            gap: 20px;
+        }
+
+        .metric-box {
+            flex: 1;
+            background: #f4f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-box h2 {
+            margin: 10px 0;
+            color: #1f3c88;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #1f3c88;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        tr:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>EcoPackAI – Sustainable Packaging Dashboard</h1>
+
+    <div class="card form-section">
+        <h3>Recommendation Selection</h3>
+
+        <select id="product_category" required>
+            <option value="">Product Category</option>
+            <option value="food">Food</option>
+            <option value="electronics">Electronics</option>
+            <option value="cosmetics">Cosmetics</option>
+        </select>
+
+        <select id="fragility" required>
+            <option value="">Fragility</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+
+        <select id="shipping_type" required>
+            <option value="">Shipping Type</option>
+            <option value="domestic">Domestic</option>
+            <option value="international">International</option>
+        </select>
+
+        <select id="sustainability_priority" required>
+            <option value="">Sustainability Priority</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+
+        <button onclick="getRecommendations()">Generate Recommendation</button>
+    </div>
+
+    <div id="dashboard"></div>
+
+</div>
+
+<script>
+
+async function getRecommendations() {
+
+    const data = {
+        product_category: document.getElementById("product_category").value,
+        fragility: document.getElementById("fragility").value,
+        shipping_type: document.getElementById("shipping_type").value,
+        sustainability_priority: document.getElementById("sustainability_priority").value
+    };
+
+    const response = await fetch("/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    let top = result.recommended_materials[0];
+
+    let html = `
+        <div class="card">
+            <h3>Performance Metrics</h3>
+            <div class="metrics">
+                <div class="metric-box">
+                    <h4>CO₂ Reduction</h4>
+                    <h2>${top.co2_reduction.toFixed(2)} %</h2>
+                </div>
+                <div class="metric-box">
+                    <h4>Cost Savings</h4>
+                    <h2>₹ ${top.cost_savings.toFixed(2)}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Top Recommended Materials</h3>
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Material</th>
+                    <th>Cost</th>
+                    <th>CO₂</th>
+                    <th>Suitability Score</th>
+                </tr>
+    `;
+
+    result.recommended_materials.forEach((item, index) => {
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.material}</td>
+                <td>${item.cost.toFixed(2)}</td>
+                <td>${item.co2.toFixed(2)}</td>
+                <td>${item.score.toFixed(3)}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </table>
+        </div>
+    `;
+
+    document.getElementById("dashboard").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
+=======
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EcoPackAI - Sustainable Packaging & BI Dashboard</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Link to external CSS -->
+ <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+
+<div class="container">
+  <h1>EcoPackAI – Smart & Sustainable Packaging</h1>
+
+  <!-- Form -->
+  <div class="card">
+    <form id="productForm">
+      <div class="form-group">
+        <label for="product_category">Product Category *</label>
+        <select id="product_category" required>
+          <option value="">-- Select Category --</option>
+          <option value="food">Food</option>
+          <option value="beverages">Beverages</option>
+          <option value="pharmaceuticals">Pharmaceuticals</option>
+          <option value="agriculture">Agriculture</option>
+          <option value="electronics">Electronics</option>
+          <option value="automotive_parts">Automotive Parts</option>
+          <option value="construction_tools">Construction Tools</option>
+          <option value="industrial_chemicals">Industrial Chemicals</option>
+          <option value="cosmetics">Cosmetics</option>
+          <option value="apparel_fashion">Apparel & Fashion</option>
+          <option value="luxury_goods">Luxury Goods</option>
+          <option value="e_commerce_general">E-commerce General</option>
+          <option value="home_appliances">Home Appliances</option>
+          <option value="toys_baby_products">Toys & Baby Products</option>
+          <option value="office_supplies">Office Supplies</option>
+        </select>
+        <div class="error" id="err_category">Please select a category</div>
+      </div>
+
+      <div class="form-group">
+        <label>Fragility Level *</label>
+        <div class="radio-group">
+          <label><input type="radio" name="fragility" value="low" required> Low</label>
+          <label><input type="radio" name="fragility" value="medium"> Medium</label>
+          <label><input type="radio" name="fragility" value="high"> High</label>
+        </div>
+        <div class="error" id="err_fragility">Please select fragility level</div>
+      </div>
+
+      <div class="form-group">
+        <label for="weight">Approximate Weight (kg) *</label>
+        <input type="number" id="weight" min="0.01" step="0.01" required placeholder="e.g. 2.5">
+        <div class="error" id="err_weight">Please enter a valid weight</div>
+      </div>
+
+      <div class="form-group">
+        <label>Shipping Type *</label>
+        <div class="radio-group">
+          <label><input type="radio" name="Shipping_Type" value="domestic" required> Domestic</label>
+          <label><input type="radio" name="Shipping_Type" value="international"> International</label>
+        </div>
+        <div class="error" id="err_shipping">Please select shipping type</div>
+      </div>
+
+      <div class="form-group">
+        <label>Sustainability Priority *</label>
+        <div class="radio-group">
+          <label><input type="radio" name="Sustainability_Priority" value="high" required> High</label>
+          <label><input type="radio" name="Sustainability_Priority" value="medium"> Medium</label>
+          <label><input type="radio" name="Sustainability_Priority" value="low"> Low</label>
+        </div>
+        <div class="error" id="err_priority">Please select priority</div>
+      </div>
+
+      <div style="text-align:center; margin-top:3rem;">
+        <button type="submit" id="submitBtn">Get Recommendations</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results + Export -->
+  <div class="card" id="results-section">
+    <h2>Your Recommended Materials</h2>
+    <div class="loading" id="loading">Finding the best eco-packaging options...</div>
+    <div id="resultsTable"></div>
+
+    <div class="export-buttons">
+      <button onclick="exportToCSV()">Export Ranking to Excel/CSV</button>
+      <button onclick="exportToPDF()">Export Summary Report (Print/PDF)</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="card" id="dashboard-section">
+    <h2>Packaging Insights Dashboard</h2>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Average CO₂ Reduction</div>
+        <div class="metric-value" id="co2Reduction" style="color: var(--success);">— %</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Estimated Cost Savings</div>
+        <div class="metric-value" id="costSavings" style="color: var(--warning);">₹ —</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Recommendations</div>
+        <div class="metric-value" id="totalRecs" style="color: var(--info);">0</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-container">
+        <canvas id="materialUsageBar"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="materialPie"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="rankingHorizontalBar"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="trendsLine"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Link to external JavaScript -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+>>>>>>> upstream/main
