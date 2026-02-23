@@ -5,17 +5,17 @@ from sklearn.preprocessing import MinMaxScaler
 import psycopg2
 import numpy as np
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
 # -------------------------------
-# DATABASE CONNECTION (RENDER SAFE)
+# DATABASE CONNECTION
 # -------------------------------
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-def get_connection():
-    return psycopg2.connect(DATABASE_URL)
-
+conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+cursor = conn.cursor()
 
 # -------------------------------
 # LOAD MODELS
@@ -52,30 +52,21 @@ def process_data():
 
 
 # -------------------------------
-# MATERIAL USAGE
+# MATERIAL USAGE (DB)
 # -------------------------------
 def get_material_usage():
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
+    cursor.execute("""
+        SELECT material_name, COUNT(*) 
+        FROM recommendations
+        GROUP BY material_name
+        ORDER BY COUNT(*) DESC
+    """)
+    rows = cursor.fetchall()
 
-        cursor.execute("""
-            SELECT material_name, COUNT(*) 
-            FROM recommendations
-            GROUP BY material_name
-            ORDER BY COUNT(*) DESC
-        """)
+    labels = [r[0] for r in rows]
+    values = [r[1] for r in rows]
 
-        rows = cursor.fetchall()
-        conn.close()
-
-        labels = [r[0] for r in rows]
-        values = [r[1] for r in rows]
-
-        return labels, values
-
-    except:
-        return [], []
+    return labels, values
 
 
 # -------------------------------
@@ -149,8 +140,8 @@ def recommend_material(input_data):
         strength_weight * data["strength_norm"]
     )
 
-    # small variation (avoid same results)
-    data["suitability_score"] += np.random.uniform(0, 0.01, len(data))
+    # tiny randomness (prevents ties but not noticeable)
+    data["suitability_score"] += np.random.uniform(0, 0.001, len(data))
 
     # ---------------- METRICS ----------------
     baseline_co2 = data["predicted_co2"].max()
@@ -160,37 +151,33 @@ def recommend_material(input_data):
         (baseline_co2 - data["predicted_co2"]) / baseline_co2
     ) * 100
 
+    # ✅ FIX: remove negative values
+    data["co2_reduction_percent"] = data["co2_reduction_percent"].clip(lower=0)
+
     data["cost_savings"] = baseline_cost - data["predicted_cost"]
 
+    # ---------------- SORT ----------------
     result = data.sort_values("suitability_score", ascending=False)
 
     top_results = result.head(3)
-    full_data = result.head(15)
+    full_data = result.head(10)
 
     # ---------------- SAVE TO DB ----------------
-    try:
-        conn = get_connection()
-        cursor = conn.cursor()
+    for _, row in top_results.iterrows():
+        cursor.execute("""
+            INSERT INTO recommendations 
+            (material_name, predicted_cost, predicted_co2, suitability_score, co2_reduction, cost_savings)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (
+            row["material_name"],
+            float(row["predicted_cost"]),
+            float(row["predicted_co2"]),
+            float(row["suitability_score"]),
+            float(row["co2_reduction_percent"]),
+            float(row["cost_savings"])
+        ))
 
-        for _, row in top_results.iterrows():
-            cursor.execute("""
-                INSERT INTO recommendations 
-                (material_name, predicted_cost, predicted_co2, suitability_score, co2_reduction, cost_savings)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (
-                row["material_name"],
-                float(row["predicted_cost"]),
-                float(row["predicted_co2"]),
-                float(row["suitability_score"]),
-                float(row["co2_reduction_percent"]),
-                float(row["cost_savings"])
-            ))
-
-        conn.commit()
-        conn.close()
-
-    except:
-        pass  # avoids crash if DB fails
+    conn.commit()
 
     return (
         top_results.to_dict(orient="records"),
@@ -203,9 +190,6 @@ def recommend_material(input_data):
 # -------------------------------
 @app.route("/export_excel")
 def export_excel():
-    conn = get_connection()
-    cursor = conn.cursor()
-
     cursor.execute("""
         SELECT material_name, predicted_cost, predicted_co2, suitability_score,
                co2_reduction, cost_savings
@@ -214,7 +198,6 @@ def export_excel():
         LIMIT 50
     """)
     rows = cursor.fetchall()
-    conn.close()
 
     df_export = pd.DataFrame(rows, columns=[
         "Material", "Cost", "CO2", "Score", "CO2 Reduction", "Cost Savings"
@@ -233,8 +216,6 @@ from reportlab.platypus import SimpleDocTemplate, Table
 
 @app.route("/export_pdf")
 def export_pdf():
-    conn = get_connection()
-    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT material_name, predicted_cost, predicted_co2, suitability_score
@@ -243,7 +224,6 @@ def export_pdf():
         LIMIT 10
     """)
     rows = cursor.fetchall()
-    conn.close()
 
     pdf_path = "report.pdf"
 
@@ -253,6 +233,7 @@ def export_pdf():
     data.extend(rows)
 
     table = Table(data)
+
     doc.build([table])
 
     return send_file(pdf_path, as_attachment=True)
@@ -298,12 +279,8 @@ def predict_form():
 
 
 # -------------------------------
-# RUN
+# RUN (Render compatible)
 # -------------------------------
 if __name__ == "__main__":
-    app.run(debug=False)
-
-# -------------------------------
-if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
