@@ -2,103 +2,185 @@
 <html>
 <head>
     <title>EcoPack AI</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
+
         body {
-            font-family: 'Georgia', serif;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #a3c09b, #dde8cf);
-            color: #2f3e23;
-            text-align: center;
-            padding: 50px;
+            background: url("https://i.pinimg.com/1200x/cc/6c/2d/cc6c2d7c7a1c02d55d8fcafdbe7d62eb.jpg") no-repeat center center;
+            scroll-behavior: smooth;
         }
 
-        h1 {
-            font-size: 36px;
+        /* ================= HERO ================= */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            
+
+            text-align: center;
+            color: #2f3e2f;
+        }
+
+        .hero h1 {
+            font-size: 48px;
             margin-bottom: 10px;
         }
 
-        p {
-            margin-bottom: 30px;
-            font-size: 16px;
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            max-width: 500px;
         }
 
-        form {
-            background: #fffaf3;
+        .hero button {
+            padding: 12px 28px;
+            background: #6a8d63;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .hero button:hover {
+            background: #4c6b49;
+        }
+
+        /* ================= FORM ================= */
+        .form-container {
+            width: 90%;
+            max-width: 500px;
+            margin: auto;
+            margin-bottom: 50px;
+
+            background: white;
             padding: 30px;
-            border-radius: 15px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(144, 169, 121, 0.573);
-            width: 320px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         label {
-            font-weight: bold;
+            font-weight: 500;
             display: block;
             margin-top: 10px;
         }
 
-        select, button {
-            width: 90%;
+        select {
+            width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin-top: 5px;
             border-radius: 8px;
-            border: 1px solid #70905e;
-            font-size: 14px;
+            border: 1px solid #ccc;
         }
 
-        button {
-            background-color: #6a8d63;
+        .submit-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #6a8d63;
+            border: none;
             color: white;
+            font-size: 16px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 15px;
+            transition: 0.3s;
         }
 
-        button:hover {
-            background-color: #486244;
+        .submit-btn:hover {
+            background: #4c6b49;
         }
+
+        /* ================= SECTION SPACING ================= */
+        #form-section {
+            padding-top: 40px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+        }
+
     </style>
 </head>
 
 <body>
 
+<!-- ================= HERO ================= -->
+<div class="hero">
     <h1>🌿 EcoPack AI</h1>
-    <p>Smart Sustainable Packaging Recommendation</p>
+    <p>Smart AI-powered sustainable packaging recommendations based on cost, CO₂ impact, and durability.</p>
+    <button onclick="scrollToForm()">Get Started ↓</button>
+</div>
 
-    <form action="/predict_form" method="POST">
+<!-- ================= FORM ================= -->
+<div id="form-section">
+    <div class="form-container">
 
-        <label>Product Category</label>
-        <select name="product_category" required>
-            <option value="">--Select--</option>
-            <option value="food">Food</option>
-            <option value="electronics">Electronics</option>
-            <option value="cosmetics">Cosmetics</option>
-        </select>
+        <h2>Get Recommendations</h2>
 
-        <label>Fragility</label>
-        <select name="fragility" required>
-            <option value="">--Select--</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-        </select>
+        <form action="/predict_form" method="POST">
 
-        <label>Shipping Type</label>
-        <select name="shipping_type" required>
-            <option value="">--Select--</option>
-            <option value="domestic">Domestic</option>
-            <option value="international">International</option>
-        </select>
+            <label>Product Category</label>
+            <select name="product_category" required>
+                <option value="food">Food</option>
+                <option value="electronics">Electronics</option>
+                <option value="cosmetics">Cosmetics</option>
+            </select>
 
-        <label>Sustainability Priority</label>
-        <select name="sustainability_priority" required>
-            <option value="">--Select--</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-        </select>
+            <label>Fragility</label>
+            <select name="fragility" required>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
 
-        <button type="submit">Get Recommendation</button>
+            <label>Shipping Type</label>
+            <select name="shipping_type" required>
+                <option value="domestic">Domestic</option>
+                <option value="international">International</option>
+            </select>
 
-    </form>
+            <label>Sustainability Priority</label>
+            <select name="sustainability_priority" required>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+
+            <button type="submit" class="submit-btn">Generate Recommendation</button>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function scrollToForm() {
+    document.getElementById("form-section").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+</script>
 
 </body>
 </html>
