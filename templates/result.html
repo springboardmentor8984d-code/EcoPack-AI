@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoPack AI Dashboard</title>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<style>
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #a3c09b, #dde8cf);
+    margin: 0;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    padding: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+/* CONTAINER */
+.container {
+    width: 90%;
+    margin: auto;
+}
+
+/* METRICS */
+.metrics {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.metric-card {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(144, 169, 121, 0.5);
+    min-width: 180px;
+}
+
+.metric-card h2 {
+    margin: 5px 0;
+}
+
+/* TABLE */
+.table-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #555c4b79;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* CHART CARDS */
+.chart-card {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* BUTTON */
+.btn {
+    display: inline-block;
+    margin: 20px;
+    padding: 10px 20px;
+    background-color: #6a8d63;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+}
+.btn:hover {
+    background-color: #486244;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🌿 EcoPack AI Dashboard</h1>
+</div>
+
+<div class="container">
+
+<!-- METRICS -->
+<div class="metrics">
+    <div class="metric-card">
+        <h4>CO₂ Reduction</h4>
+        <h2>{{ avg_co2 }}%</h2>
+        <small>Compared to baseline</small>
+    </div>
+
+    <div class="metric-card">
+        <h4>Cost Savings</h4>
+        <h2>{{ avg_cost }}</h2>
+        <small>Compared to highest cost</small>
+    </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-card">
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Material</th>
+            <th>Cost</th>
+            <th>CO₂</th>
+            <th>Score</th>
+        </tr>
+
+        {% for r in results %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ r.material_name }}</td>
+            <td>{{ r.predicted_cost }}</td>
+            <td>{{ r.predicted_co2 }}</td>
+            <td>{{ r.suitability_score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<br>
+
+<!-- CHARTS -->
+<div class="grid">
+
+    <div class="chart-card">
+        <h3>CO₂ Reduction Trend</h3>
+        <div id="co2Trend"></div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Cost Savings Trend</h3>
+        <div id="costTrend"></div>
+    </div>
+
+</div>
+
+<br>
+
+<!-- MATERIAL USAGE -->
+<div class="chart-card">
+    <h3>Material Usage (All Recommendations)</h3>
+    <div id="usageChart"></div>
+</div>
+
+<br>
+
+<!-- FULL COMPARISON -->
+<div class="chart-card">
+    <h3>Material Comparison (Top 15)</h3>
+    <div style="overflow-x:auto;">
+        <div id="comparisonChart" style="min-width:900px;"></div>
+    </div>
+</div>
+
+<!-- EXPORT BUTTONS -->
+<div style="text-align:center;">
+    <a href="/export_excel" class="btn">Export Excel</a>
+    <a href="/export_pdf" class="btn">Export PDF</a>
+</div>
+
+<!-- BACK BUTTON -->
+<div style="text-align:center;">
+    <a href="/" class="btn">← Go Back</a>
+</div>
+
+</div>
+
+<!-- ===================== -->
+<!-- PLOTLY -->
+<!-- ===================== -->
+<script>
+
+// CO2 TREND
+var co2 = [{% for r in results %}{{ r.co2_reduction_percent }},{% endfor %}];
+
+Plotly.newPlot('co2Trend', [{
+    y: co2,
+    type: 'scatter',
+    mode: 'lines+markers'
+}], {margin:{t:20}});
+
+// COST TREND
+var cost = [{% for r in results %}{{ r.cost_savings }},{% endfor %}];
+
+Plotly.newPlot('costTrend', [{
+    y: cost,
+    type: 'scatter',
+    mode: 'lines+markers'
+}], {margin:{t:20}});
+
+// MATERIAL USAGE
+var usageLabels = {{ usage_labels|tojson }};
+var usageValues = {{ usage_values|tojson }};
+
+Plotly.newPlot('usageChart', [{
+    x: usageLabels,
+    y: usageValues,
+    type: 'bar'
+}]);
+
+// FULL MATERIAL COMPARISON
+var materials = [{% for r in full_data %}"{{ r.material_name }}",{% endfor %}];
+var scores = [{% for r in full_data %}{{ r.suitability_score }},{% endfor %}];
+
+Plotly.newPlot('comparisonChart', [{
+    x: scores,
+    y: materials,
+    type: 'bar',
+    orientation: 'h'
+}], {
+    margin: {l: 200},
+    height: 600
+});
+
+</script>
+
+</body>
+</html>
