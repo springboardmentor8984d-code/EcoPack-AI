@@ -5,9 +5,6 @@ from sklearn.preprocessing import MinMaxScaler
 import psycopg2
 import numpy as np
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
 
@@ -283,4 +280,5 @@ def predict_form():
 # -------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
