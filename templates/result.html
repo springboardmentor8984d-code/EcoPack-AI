@@ -5,7 +5,6 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <style>
-
 body {
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #a3c09b, #dde8cf);
@@ -42,12 +41,8 @@ body {
     background: white;
     padding: 15px 25px;
     border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(144, 169, 121, 0.5);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     min-width: 180px;
-}
-
-.metric-card h2 {
-    margin: 5px 0;
 }
 
 /* TABLE */
@@ -65,7 +60,8 @@ table {
 }
 
 th {
-    background: #555c4b79;
+    background: #6a8d63;
+    color: white;
 }
 
 th, td {
@@ -80,10 +76,10 @@ th, td {
     gap: 20px;
 }
 
-/* CHART CARDS */
+/* CHART CARD */
 .chart-card {
     background: white;
-    padding: 15px;
+    padding: 20px;
     border-radius: 15px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
@@ -91,13 +87,14 @@ th, td {
 /* BUTTON */
 .btn {
     display: inline-block;
-    margin: 20px;
-    padding: 10px 20px;
+    margin: 40px auto;
+    padding: 12px 25px;
     background-color: #6a8d63;
     color: white;
     text-decoration: none;
     border-radius: 10px;
 }
+
 .btn:hover {
     background-color: #486244;
 }
@@ -108,7 +105,6 @@ th, td {
         grid-template-columns: 1fr;
     }
 }
-
 </style>
 </head>
 
@@ -123,15 +119,13 @@ th, td {
 <!-- METRICS -->
 <div class="metrics">
     <div class="metric-card">
-        <h4>CO₂ Reduction</h4>
-        <h2>{{ avg_co2 }}%</h2>
-        <small>Compared to baseline</small>
+        <strong>Avg CO₂ Reduction</strong><br>
+        {{ avg_co2 }} %
     </div>
 
     <div class="metric-card">
-        <h4>Cost Savings</h4>
-        <h2>{{ avg_cost }}</h2>
-        <small>Compared to highest cost</small>
+        <strong>Avg Cost Savings</strong><br>
+        {{ avg_cost }}
     </div>
 </div>
 
@@ -150,9 +144,9 @@ th, td {
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ r.material_name }}</td>
-            <td>{{ r.predicted_cost }}</td>
-            <td>{{ r.predicted_co2 }}</td>
-            <td>{{ r.suitability_score }}</td>
+            <td>{{ r.predicted_cost | round(2) }}</td>
+            <td>{{ r.predicted_co2 | round(2) }}</td>
+            <td>{{ r.suitability_score | round(3) }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -164,13 +158,13 @@ th, td {
 <div class="grid">
 
     <div class="chart-card">
-        <h3>CO₂ Reduction Trend</h3>
-        <div id="co2Trend"></div>
+        <h3>CO₂ Comparison (Top Materials)</h3>
+        <div id="co2Chart"></div>
     </div>
 
     <div class="chart-card">
-        <h3>Cost Savings Trend</h3>
-        <div id="costTrend"></div>
+        <h3>Cost Comparison (Top Materials)</h3>
+        <div id="costChart"></div>
     </div>
 
 </div>
@@ -183,77 +177,56 @@ th, td {
     <div id="usageChart"></div>
 </div>
 
-<br>
-
-<!-- FULL COMPARISON -->
-<div class="chart-card">
-    <h3>Material Comparison (Top 15)</h3>
-    <div style="overflow-x:auto;">
-        <div id="comparisonChart" style="min-width:900px;"></div>
-    </div>
-</div>
-
-<!-- EXPORT BUTTONS -->
-<div style="text-align:center;">
-    <a href="/export_excel" class="btn">Export Excel</a>
-    <a href="/export_pdf" class="btn">Export PDF</a>
-</div>
-
-<!-- BACK BUTTON -->
+<!-- BUTTON -->
 <div style="text-align:center;">
     <a href="/" class="btn">← Go Back</a>
 </div>
 
 </div>
 
-<!-- ===================== -->
-<!-- PLOTLY -->
-<!-- ===================== -->
 <script>
 
-// CO2 TREND
-var co2 = [{% for r in results %}{{ r.co2_reduction_percent }},{% endfor %}];
+// ===== TOP MATERIALS (change 5 → 10 if needed) =====
+var materials = [{% for r in full_data[:5] %}"{{ r.material_name }}",{% endfor %}];
+var co2_vals = [{% for r in full_data[:5] %}{{ r.predicted_co2 }},{% endfor %}];
+var cost_vals = [{% for r in full_data[:5] %}{{ r.predicted_cost }},{% endfor %}];
 
-Plotly.newPlot('co2Trend', [{
-    y: co2,
-    type: 'scatter',
-    mode: 'lines+markers'
-}], {margin:{t:20}});
-
-// COST TREND
-var cost = [{% for r in results %}{{ r.cost_savings }},{% endfor %}];
-
-Plotly.newPlot('costTrend', [{
-    y: cost,
-    type: 'scatter',
-    mode: 'lines+markers'
-}], {margin:{t:20}});
-
-// MATERIAL USAGE
-var usageLabels = {{ usage_labels|tojson }};
-var usageValues = {{ usage_values|tojson }};
-
-Plotly.newPlot('usageChart', [{
-    x: usageLabels,
-    y: usageValues,
+// ===== CO2 CHART =====
+Plotly.newPlot('co2Chart', [{
+    x: materials,
+    y: co2_vals,
     type: 'bar'
-}]);
-
-// FULL MATERIAL COMPARISON
-var materials = [{% for r in full_data %}"{{ r.material_name }}",{% endfor %}];
-var scores = [{% for r in full_data %}{{ r.suitability_score }},{% endfor %}];
-
-Plotly.newPlot('comparisonChart', [{
-    x: scores,
-    y: materials,
-    type: 'bar',
-    orientation: 'h'
 }], {
-    margin: {l: 200},
-    height: 600
+    margin:{t:30},
+    xaxis:{title:"Material"},
+    yaxis:{title:"CO₂"}
+});
+
+// ===== COST CHART =====
+Plotly.newPlot('costChart', [{
+    x: materials,
+    y: cost_vals,
+    type: 'bar'
+}], {
+    margin:{t:30},
+    xaxis:{title:"Material"},
+    yaxis:{title:"Cost"}
+});
+
+// ===== USAGE CHART =====
+Plotly.newPlot('usageChart', [{
+    x: {{ usage_labels | safe }},
+    y: {{ usage_values | safe }},
+    type: 'bar'
+}], {
+    margin:{t:30},
+    xaxis:{title:"Material"},
+    yaxis:{title:"Count"}
 });
 
 </script>
 
 </body>
+</html>
+
 </html>
