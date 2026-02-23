@@ -4,25 +4,22 @@ import joblib
 from sklearn.preprocessing import MinMaxScaler
 import psycopg2
 import numpy as np
-
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from reportlab.platypus import SimpleDocTemplate, Table
 
 app = Flask(__name__)
 
 # -------------------------------
-# DATABASE CONNECTION
+# DATABASE CONNECTION (SAFE)
 # -------------------------------
-conn = psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    port=os.getenv("DB_PORT")
-)
-cursor = conn.cursor()
+def get_db_connection():
+    return psycopg2.connect(
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        port=os.getenv("DB_PORT")
+    )
 
 # -------------------------------
 # LOAD MODELS
@@ -35,7 +32,6 @@ scaler = joblib.load("scaler.pkl")
 # LOAD DATASET
 # -------------------------------
 df = pd.read_csv("ecopackai_unique_materials_dataset.csv")
-
 
 # -------------------------------
 # PROCESS DATA
@@ -57,11 +53,13 @@ def process_data():
 
     return data
 
-
 # -------------------------------
 # MATERIAL USAGE (DB)
 # -------------------------------
 def get_material_usage():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
     cursor.execute("""
         SELECT material_name, COUNT(*) 
         FROM recommendations
@@ -70,11 +68,12 @@ def get_material_usage():
     """)
     rows = cursor.fetchall()
 
+    conn.close()
+
     labels = [r[0] for r in rows]
     values = [r[1] for r in rows]
 
     return labels, values
-
 
 # -------------------------------
 # RECOMMENDATION LOGIC
@@ -165,6 +164,9 @@ def recommend_material(input_data):
     full_data = result.head(15)
 
     # ---------------- SAVE TO DB ----------------
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
     for _, row in top_results.iterrows():
         cursor.execute("""
             INSERT INTO recommendations 
@@ -180,18 +182,22 @@ def recommend_material(input_data):
         ))
 
     conn.commit()
+    conn.close()
 
     return (
         top_results.to_dict(orient="records"),
         full_data.to_dict(orient="records")
     )
 
-
 # -------------------------------
 # EXPORT EXCEL
 # -------------------------------
 @app.route("/export_excel")
 def export_excel():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
     cursor.execute("""
         SELECT material_name, predicted_cost, predicted_co2, suitability_score,
                co2_reduction, cost_savings
@@ -200,6 +206,8 @@ def export_excel():
         LIMIT 50
     """)
     rows = cursor.fetchall()
+
+    conn.close()
 
     df_export = pd.DataFrame(rows, columns=[
         "Material", "Cost", "CO2", "Score", "CO2 Reduction", "Cost Savings"
@@ -210,14 +218,14 @@ def export_excel():
 
     return send_file(file_path, as_attachment=True)
 
-
 # -------------------------------
 # EXPORT PDF
 # -------------------------------
-from reportlab.platypus import SimpleDocTemplate, Table
-
 @app.route("/export_pdf")
 def export_pdf():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT material_name, predicted_cost, predicted_co2, suitability_score
@@ -226,6 +234,8 @@ def export_pdf():
         LIMIT 10
     """)
     rows = cursor.fetchall()
+
+    conn.close()
 
     pdf_path = "report.pdf"
 
@@ -240,14 +250,12 @@ def export_pdf():
 
     return send_file(pdf_path, as_attachment=True)
 
-
 # -------------------------------
 # ROUTES
 # -------------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
-
 
 @app.route("/predict_form", methods=["POST"])
 def predict_form():
@@ -279,7 +287,6 @@ def predict_form():
         usage_values=values
     )
 
-
 # -------------------------------
 if __name__ == "__main__":
-    app.run(debug=False, port=5001)
+    app.run(debug=False)
