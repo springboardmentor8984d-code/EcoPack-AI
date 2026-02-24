@@ -7,18 +7,19 @@ The system predicts:
 - Packaging Cost
 - CO₂ Emission Impact
 
-It then ranks materials using a weighted scoring framework and visualizes results through an interactive BI dashboard.
+It ranks materials using a dynamic weighted scoring framework and visualizes results through an interactive dashboard.
 
 ---
 
 ## Key Features
 - Machine Learning–based cost and CO₂ prediction
-- Dynamic material ranking logic
+- Dynamic weighted ranking logic
 - Top 5 recommendation system
-- Business Intelligence dashboard (Plotly charts)
-- SQLite database logging for usage tracking
-- Excel export (Full ranking)
+- Interactive BI dashboard (Plotly charts)
+- PostgreSQL cloud database logging
+- Excel export (Full ranking report)
 - PDF export (Top 5 summary report)
+- Production-ready deployment (Render + Gunicorn)
 
 ---
 
@@ -27,6 +28,7 @@ It then ranks materials using a weighted scoring framework and visualizes result
 ### Backend
 - Python
 - Flask
+- Gunicorn (Production WSGI Server)
 
 ### Machine Learning
 - Random Forest Regressor
@@ -42,7 +44,8 @@ It then ranks materials using a weighted scoring framework and visualizes result
 - Plotly
 
 ### Database
-- SQLite (for recommendation logging)
+- PostgreSQL (Render Cloud)
+- Environment-based secure configuration
 
 ### Export
 - Pandas (Excel)
@@ -53,44 +56,81 @@ It then ranks materials using a weighted scoring framework and visualizes result
 ## System Workflow
 1. User selects product filters (category, fragility, shipping type, sustainability priority).
 2. Backend generates feature vector.
-3. ML models predict cost and CO₂.
+3. ML models predict cost and CO₂ impact.
 4. Weighted ranking formula calculates final score.
 5. Top 5 materials are displayed.
-6. Usage data is logged into database.
+6. Usage data is logged into PostgreSQL database.
 7. Reports can be exported in Excel or PDF format.
 
 ---
 
-## Installation & Setup
+## Ranking Logic
+
+Final Score is calculated using:
+
+Final Score =  
+(Weight₁ × Predicted Cost) +  
+(Weight₂ × Predicted CO₂) +  
+(Weight₃ × Suitability Score)
+
+Weights dynamically adjust based on:
+- Shipping type (Domestic / International)
+- Sustainability priority (Low / Medium / High)
+
+Lower final score → Higher rank.
+
+---
+
+## Live Deployment
+
+Backend deployed on Render:
+
+https://ecopackai-backend-6rv7.onrender.com
+
+---
+
+## Installation & Local Setup
 
 1. Clone the repository
-2. Install dependencies:
 
+2. Install dependencies:
    pip install -r requirements.txt
 
-3. Run the application:
+3. Set environment variable:
+   DATABASE_URL=your_postgresql_connection_string
 
+
+4. Run locally:
    python app.py
 
-4. Open browser and go to:
-   http://127.0.0.1:5000
+
+---
+
+## Production Setup
+
+The application runs in production using:
+gunicorn app:app
+
+
+Debug mode is disabled in production.
 
 ---
 
 ## Current Status
 - ML model training completed
+- Flask backend fully implemented
 - Dashboard integration completed
-- SQLite database logging implemented
-- Export functionality implemented
-- Ready for demo presentation
+- PostgreSQL cloud integration completed
+- Production deployment completed
+- Export functionality verified
+- System production-ready
 
 ---
 
 ## Future Enhancements
-- PostgreSQL cloud integration
-- Cloud deployment (Render/Heroku)
 - Real-time carbon emission API integration
 - Multi-dataset support
+- Advanced authentication & user roles
 - Enterprise-scale scalability improvements
 
 ---
