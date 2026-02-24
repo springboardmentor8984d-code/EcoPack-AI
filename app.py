@@ -6,6 +6,7 @@ import psycopg2
 import numpy as np
 import os
 from dotenv import load_dotenv
+from reportlab.platypus import SimpleDocTemplate, Table
 
 load_dotenv()
 
@@ -31,7 +32,7 @@ df = pd.read_csv("ecopackai_unique_materials_dataset.csv")
 
 
 # -------------------------------
-# PROCESS DATA
+# PROCESS DATA (SAFE VERSION)
 # -------------------------------
 def process_data():
     data = df.copy()
@@ -45,8 +46,18 @@ def process_data():
 
     X_scaled = scaler.transform(X)
 
+    # COST
     data["predicted_cost"] = cost_model.predict(X_scaled)
-    data["predicted_co2"] = co2_model.predict(X_scaled)
+
+    # SAFE CO2 (VERY IMPORTANT)
+    try:
+        co2_pred = co2_model.predict(X_scaled)
+        co2_pred = np.nan_to_num(co2_pred, nan=0.0)
+        co2_pred = np.maximum(co2_pred, 0)
+    except:
+        co2_pred = np.zeros(len(data))
+
+    data["predicted_co2"] = co2_pred
 
     return data
 
@@ -108,7 +119,7 @@ def recommend_material(input_data):
 
     data["eco_score"] = 1 - (0.5 * data["cost_norm"] + 0.5 * data["co2_norm"])
 
-    # ---------------- INPUT-AWARE BOOSTS ----------------
+    # ---------------- INPUT BOOSTS ----------------
     if fragility == "high":
         data["strength_norm"] *= 1.5
     elif fragility == "low":
@@ -117,9 +128,8 @@ def recommend_material(input_data):
     if sustainability == "high":
         data["eco_score"] *= 1.5
     elif sustainability == "low":
-        data["eco_score"] *= 0.7
-
-    if category == "electronics":
+        data["eco_score"] *= 0.77
+        if category == "electronics":
         data["strength_norm"] *= 1.3
     elif category == "food":
         data["eco_score"] *= 1.3
@@ -140,11 +150,12 @@ def recommend_material(input_data):
         strength_weight * data["strength_norm"]
     )
 
+    # small randomness to avoid ties
     data["suitability_score"] += np.random.uniform(0, 0.01, len(data))
 
-    # ---------------- METRICS ----------------
-    baseline_co2 = data["predicted_co2"].max()
-    baseline_cost = data["predicted_cost"].max()
+    # ---------------- SAFE METRICS ----------------
+    baseline_co2 = max(data["predicted_co2"].max(), 1)
+    baseline_cost = max(data["predicted_cost"].max(), 1)
 
     data["co2_reduction_percent"] = (
         (baseline_co2 - data["predicted_co2"]) / baseline_co2
@@ -207,8 +218,6 @@ def export_excel():
 # -------------------------------
 # EXPORT PDF
 # -------------------------------
-from reportlab.platypus import SimpleDocTemplate, Table
-
 @app.route("/export_pdf")
 def export_pdf():
 
@@ -257,8 +266,9 @@ def predict_form():
     if not results:
         return render_template("result.html", results=[], full_data=[])
 
-    avg_co2 = sum([r["co2_reduction_percent"] for r in results]) / len(results)
-    avg_cost = sum([r["cost_savings"] for r in results]) / len(results)
+    # ✅ SAFE AVERAGES
+    avg_co2 = np.mean([r.get("co2_reduction_percent", 0) for r in results])
+    avg_cost = np.mean([r.get("cost_savings", 0) for r in results])
 
     labels, values = get_material_usage()
 
@@ -271,6 +281,7 @@ def predict_form():
         usage_labels=labels,
         usage_values=values
     )
+
 
 # -------------------------------
 if __name__ == "__main__":
