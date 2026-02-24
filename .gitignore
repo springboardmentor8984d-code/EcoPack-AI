@@ -1,7 +1,7 @@
 venv/
 .env
-_pycache_/
-*.pyc
-ecopackai.db
+__pycache__/
+*.db
 *.xlsx
-*.pdf
+.ipynb_checkpoints/
+*.pyc

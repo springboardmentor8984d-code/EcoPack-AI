@@ -68,9 +68,9 @@ It ranks materials using a dynamic weighted scoring framework and visualizes res
 
 Final Score is calculated using:
 
-Final Score =
-(Weight₁ × Predicted Cost) +
-(Weight₂ × Predicted CO₂) +
+Final Score =  
+(Weight₁ × Predicted Cost) +  
+(Weight₂ × Predicted CO₂) +  
 (Weight₃ × Suitability Score)
 
 Weights dynamically adjust based on:
@@ -136,5 +136,5 @@ Debug mode is disabled in production.
 ---
 
 ## Author
-Nilesh Gawhale
+Nilesh Gawhale  
 Infosys Springboard Internship – Batch 11
