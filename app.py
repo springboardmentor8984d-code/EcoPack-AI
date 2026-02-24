@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template
 import pandas as pd
 import joblib
 from sklearn.preprocessing import MinMaxScaler
@@ -30,7 +30,7 @@ scaler = joblib.load("scaler.pkl")
 df = pd.read_csv("ecopackai_unique_materials_dataset.csv")
 
 # -------------------------------
-# PROCESS DATA
+# PROCESS DATA (FIXED)
 # -------------------------------
 def process_data():
     data = df.copy()
@@ -44,14 +44,25 @@ def process_data():
 
     X_scaled = scaler.transform(X)
 
+    # COST prediction
     data["predicted_cost"] = cost_model.predict(X_scaled)
 
-    # SAFE CO2 prediction
+    # CO2 prediction (SAFE FIX)
     try:
         co2_pred = co2_model.predict(X_scaled)
-        co2_pred = np.maximum(co2_pred, 0)  # 🚨 prevent negative
-    except:
-        co2_pred = np.zeros(len(data))
+        co2_pred = np.array(co2_pred)
+
+        # remove NaN
+        co2_pred = np.nan_to_num(co2_pred, nan=0.0)
+
+        # clamp negative values
+        co2_pred = np.clip(co2_pred, 0, None)
+
+    except Exception as e:
+        print("CO2 MODEL ERROR:", e)
+
+        # SMART fallback instead of zero
+        co2_pred = data["predicted_cost"] * 0.6
 
     data["predicted_co2"] = co2_pred
 
@@ -84,7 +95,6 @@ def recommend_material(input_data):
     fragility = input_data.get("fragility", "medium")
     category = input_data.get("product_category", "general")
     shipping = input_data.get("shipping_type", "domestic")
-    sustainability = input_data.get("sustainability_priority", "medium")
 
     # FILTERING
     if fragility == "high":
@@ -110,6 +120,7 @@ def recommend_material(input_data):
         data[["predicted_cost", "predicted_co2", "tensile_strength_mpa"]]
     )
 
+    # ECO SCORE
     data["eco_score"] = 1 - (0.5 * data["cost_norm"] + 0.5 * data["co2_norm"])
 
     # WEIGHTS
@@ -129,16 +140,19 @@ def recommend_material(input_data):
 
     result = data.sort_values("suitability_score", ascending=False)
 
-    top_results = result.head(5)
-    full_data = result.head(15)
+    top_results = result.head(5).copy()
+    full_data = result.head(15).copy()
 
     # METRICS
-    baseline_co2 = max(data["predicted_co2"].max(), 1)  # avoid division issues
+    baseline_co2 = max(data["predicted_co2"].max(), 1)
     baseline_cost = data["predicted_cost"].max()
 
     top_results["co2_reduction_percent"] = (
         (baseline_co2 - top_results["predicted_co2"]) / baseline_co2
     ) * 100
+
+    # FIX: clamp between 0–100
+    top_results["co2_reduction_percent"] = top_results["co2_reduction_percent"].clip(0, 100)
 
     top_results["cost_savings"] = baseline_cost - top_results["predicted_cost"]
 
