@@ -2,32 +2,45 @@ from flask import Flask, request, jsonify, render_template, send_file
 import pandas as pd
 import numpy as np
 import pickle
-import sqlite3
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.platypus import TableStyle
-import os
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 
-# ================= DATABASE =================
+# ================= DATABASE CONNECTION =================
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+
+def get_db_connection():
+    return psycopg2.connect(DATABASE_URL)
+
 def init_db():
-    conn = sqlite3.connect("ecopackai.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usage_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             material_name TEXT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
+    cursor.close()
     conn.close()
 
+# Initialize DB
 init_db()
 
 # ================= LOAD DATA =================
+
 df = pd.read_csv("EcoPackAI_materials.csv")
 
 rf_cost = pickle.load(open("rf_cost.pkl", "rb"))
@@ -41,6 +54,7 @@ last_full_ranking = []
 last_top5 = []
 
 # ================= FILTER =================
+
 def apply_filters(data, category, fragility):
     filtered = data.copy()
 
@@ -59,6 +73,7 @@ def apply_filters(data, category, fragility):
     return filtered
 
 # ================= WEIGHTS =================
+
 def get_weights(shipping, sustainability):
     cost_w, co2_w, suit_w = 0.4, 0.4, 0.2
 
@@ -71,6 +86,7 @@ def get_weights(shipping, sustainability):
     return cost_w, co2_w, suit_w
 
 # ================= ROUTES =================
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -123,34 +139,37 @@ def recommend():
     last_full_ranking = results
     last_top5 = results[:5]
 
-    # Store usage count
-    conn = sqlite3.connect("ecopackai.db")
+    # Store usage in PostgreSQL
+    conn = get_db_connection()
     cursor = conn.cursor()
     for item in last_top5:
-        cursor.execute("INSERT INTO usage_log (material_name) VALUES (?)", (item["material"],))
+        cursor.execute(
+            "INSERT INTO usage_log (material_name) VALUES (%s)",
+            (item["material"],)
+        )
     conn.commit()
+    cursor.close()
     conn.close()
 
     return jsonify(results[:5])
 
-# ================= USAGE =================
 @app.route("/usage")
 def usage():
-    conn = sqlite3.connect("ecopackai.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT material_name, COUNT(*) 
+        SELECT material_name, COUNT(*)
         FROM usage_log
         GROUP BY material_name
     """)
 
     data = cursor.fetchall()
+    cursor.close()
     conn.close()
 
     return jsonify({row[0]: row[1] for row in data})
 
-# ================= EXPORT EXCEL =================
 @app.route("/export_excel")
 def export_excel():
     if not last_full_ranking:
@@ -161,7 +180,6 @@ def export_excel():
     df_export.to_excel(file_path, index=True)
     return send_file(file_path, as_attachment=True)
 
-# ================= EXPORT PDF =================
 @app.route("/export_pdf")
 def export_pdf():
     if not last_top5:
@@ -172,7 +190,7 @@ def export_pdf():
     elements = []
 
     styles = getSampleStyleSheet()
-    elements.append(Paragraph("<b>EcoPackAI - Recommendation Summary</b>", styles["Title"]))
+    elements.append(Paragraph("<b>EcoPackAI - Recommendate Materials</b>", styles["Title"]))
     elements.append(Spacer(1, 15))
 
     data = [["Rank", "Material", "Predicted Cost", "Predicted CO2", "CO2 Reduction", "Cost Saving"]]
@@ -201,4 +219,4 @@ def export_pdf():
     return send_file(file_path, as_attachment=True)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
