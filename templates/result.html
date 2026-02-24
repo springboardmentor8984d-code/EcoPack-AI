@@ -43,7 +43,6 @@ body {
     border-radius: 15px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     min-width: 180px;
-    text-align: center;
 }
 
 /* TABLE */
@@ -88,7 +87,7 @@ th, td {
 /* BUTTON */
 .btn {
     display: inline-block;
-    margin: 10px;
+    margin: 40px auto;
     padding: 12px 25px;
     background-color: #6a8d63;
     color: white;
@@ -121,12 +120,12 @@ th, td {
 <div class="metrics">
     <div class="metric-card">
         <strong>Avg CO₂ Reduction</strong><br>
-        {{ avg_co2 | round(2) if avg_co2 else 0 }} %
+        {{ avg_co2 }} %
     </div>
 
     <div class="metric-card">
         <strong>Avg Cost Savings</strong><br>
-        ₹ {{ avg_cost | round(2) if avg_cost else 0 }}
+        {{ avg_cost }}
     </div>
 </div>
 
@@ -159,12 +158,12 @@ th, td {
 <div class="grid">
 
     <div class="chart-card">
-        <h3>CO₂ Comparison (Sorted: Low → High)</h3>
+        <h3>CO₂ Comparison (Top Materials)</h3>
         <div id="co2Chart"></div>
     </div>
 
     <div class="chart-card">
-        <h3>Cost Comparison (Sorted: Low → High)</h3>
+        <h3>Cost Comparison (Top Materials)</h3>
         <div id="costChart"></div>
     </div>
 
@@ -178,13 +177,21 @@ th, td {
     <div id="usageChart"></div>
 </div>
 
-<!-- EXPORT BUTTONS -->
-<div style="text-align: center;">
-    <a href="/export_excel" class="btn">📊 Export Excel</a>
-    <a href="/export_pdf" class="btn">📄 Export PDF</a>
+
+<div style="text-align: center; ">
+    
+    <a href="/export_excel" class="btn">
+            📊 Export Excel
+    </a>
+
+    <a href="/export_pdf" class="btn">
+            📄 Export PDF
+    </a>
+
 </div>
 
-<!-- BACK BUTTON -->
+
+<!-- BUTTON -->
 <div style="text-align:center;">
     <a href="/" class="btn">← Go Back</a>
 </div>
@@ -193,58 +200,42 @@ th, td {
 
 <script>
 
-// ===== GET DATA =====
+// ===== TOP MATERIALS (change 5 → 10 if needed) =====
 var materials = [{% for r in full_data[:5] %}"{{ r.material_name }}",{% endfor %}];
 var co2_vals = [{% for r in full_data[:5] %}{{ r.predicted_co2 }},{% endfor %}];
 var cost_vals = [{% for r in full_data[:5] %}{{ r.predicted_cost }},{% endfor %}];
 
-// ===== SORT DATA =====
-function sortData(labels, values) {
-    let combined = labels.map((l, i) => ({label: l, value: values[i]}));
-    combined.sort((a, b) => a.value - b.value);
-    return {
-        labels: combined.map(x => x.label),
-        values: combined.map(x => x.value)
-    };
-}
-
-var co2_sorted = sortData(materials, co2_vals);
-var cost_sorted = sortData(materials, cost_vals);
-
-// ===== CO2 CHART (GREEN) =====
+// ===== CO2 CHART =====
 Plotly.newPlot('co2Chart', [{
-    x: co2_sorted.labels,
-    y: co2_sorted.values,
-    type: 'bar',
-    marker: { color: 'green' }
+    x: materials,
+    y: co2_vals,
+    type: 'bar'
 }], {
     margin:{t:30},
     xaxis:{title:"Material"},
-    yaxis:{title:"CO₂ (Lower = Better)"}
+    yaxis:{title:"CO₂"}
 });
 
-// ===== COST CHART (RED) =====
+// ===== COST CHART =====
 Plotly.newPlot('costChart', [{
-    x: cost_sorted.labels,
-    y: cost_sorted.values,
-    type: 'bar',
-    marker: { color: 'crimson' }
+    x: materials,
+    y: cost_vals,
+    type: 'bar'
 }], {
     margin:{t:30},
     xaxis:{title:"Material"},
-    yaxis:{title:"Cost (Lower = Better)"}
+    yaxis:{title:"Cost"}
 });
 
 // ===== USAGE CHART =====
 Plotly.newPlot('usageChart', [{
     x: {{ usage_labels | safe }},
     y: {{ usage_values | safe }},
-    type: 'bar',
-    marker: { color: '#6a8d63' }
+    type: 'bar'
 }], {
     margin:{t:30},
     xaxis:{title:"Material"},
-    yaxis:{title:"Usage Count"}
+    yaxis:{title:"Count"}
 });
 
 </script>
