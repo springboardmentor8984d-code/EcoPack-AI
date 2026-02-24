@@ -141,15 +141,17 @@ def recommend_material(input_data):
     data["suitability_score"] += np.random.uniform(0, 0.01, len(data))
 
     # ---------------- METRICS ----------------
-    baseline_co2 = data["predicted_co2"].max()
-    baseline_cost = data["predicted_cost"].max()
+    baseline_co2 = df["co2_emission_kg"].max() if "co2_emission_kg" in df.columns else data["predicted_co2"].max()
+    baseline_cost = df["cost_per_unit"].max() if "cost_per_unit" in df.columns else data["predicted_cost"].max()
 
     data["co2_reduction_percent"] = (
-        (baseline_co2 - data["predicted_co2"]) / baseline_co2
-    ) * 100
+    (baseline_co2 - data["predicted_co2"]) / baseline_co2) * 100
+
+    # 🔥 FIX NEGATIVE VALUES
+    data["co2_reduction_percent"] = data["co2_reduction_percent"].clip(lower=0)
 
 
-    data["cost_savings"] = baseline_cost - data["predicted_cost"]
+    data["cost_savings"] = (baseline_cost - data["predicted_cost"]).clip(lower=0)
 
     # ---------------- SORT ----------------
     result = data.sort_values("suitability_score", ascending=False)
