@@ -14,7 +14,9 @@ app = Flask(__name__)
 # -------------------------------
 # DATABASE CONNECTION
 # -------------------------------
-conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+conn = psycopg2.connect(DATABASE_URL, sslmode="require")
 cursor = conn.cursor()
 
 # -------------------------------
