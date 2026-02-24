@@ -160,8 +160,8 @@ def recommend_material(input_data):
 
     result = data.sort_values("suitability_score", ascending=False)
 
-    top_results = result.head(5)
-    full_data = result.head(15)
+    top_results = result.head(5).copy()
+    full_data = result.head(15).copy()
 
     # ---------------- SAVE TO DB ----------------
     for _, row in top_results.iterrows():
