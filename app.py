@@ -95,6 +95,7 @@ def recommend_material(input_data):
     fragility = input_data.get("fragility", "medium")
     category = input_data.get("product_category", "general")
     shipping = input_data.get("shipping_type", "domestic")
+    sustainability = input_data.get("sustainability_priority", "medium")
 
     # FILTERING
     if fragility == "high":
@@ -123,6 +124,19 @@ def recommend_material(input_data):
     # ECO SCORE
     data["eco_score"] = 1 - (0.5 * data["cost_norm"] + 0.5 * data["co2_norm"])
 
+    if fragility == "high":
+        data["strength_norm"] *= 1.5
+    elif fragility == "low":
+        data["strength_norm"] *= 0.7
+    if sustainability == "high":
+        data["eco_score"] *= 1.5
+    elif sustainability == "low":
+        data["eco_score"] *= 0.7
+    if category == "electronics":
+        data["strength_norm"] *= 1.3
+    elif category == "food":
+        data["eco_score"] *= 1.3
+
     # WEIGHTS
     eco_weight = 0.4
     cost_weight = 0.3
@@ -137,6 +151,15 @@ def recommend_material(input_data):
         cost_weight * (1 - data["cost_norm"]) +
         strength_weight * data["strength_norm"]
     )
+
+    data["suitability_score"] += np.random.uniform(0, 0.01, len(data))
+    # ---------------- METRICS ----------------
+    baseline_co2 = data["predicted_co2"].max()
+    baseline_cost = data["predicted_cost"].max()
+    data["co2_reduction_percent"] = (
+        (baseline_co2 - data["predicted_co2"]) / baseline_co2
+    ) * 100
+    data["cost_savings"] = baseline_cost - data["predicted_cost"]
 
     result = data.sort_values("suitability_score", ascending=False)
 
@@ -177,7 +200,45 @@ def recommend_material(input_data):
         top_results.to_dict(orient="records"),
         full_data.to_dict(orient="records")
     )
-
+# -------------------------------
+# EXPORT EXCEL
+# -------------------------------
+@app.route("/export_excel")
+def export_excel():
+    cursor.execute("""
+        SELECT material_name, predicted_cost, predicted_co2, suitability_score,
+               co2_reduction, cost_savings
+        FROM recommendations
+        ORDER BY id DESC
+        LIMIT 50
+    """)
+    rows = cursor.fetchall()
+    df_export = pd.DataFrame(rows, columns=[
+        "Material", "Cost", "CO2", "Score", "CO2 Reduction", "Cost Savings"
+    ])
+    file_path = "export.xlsx"
+    df_export.to_excel(file_path, index=False)
+    return send_file(file_path, as_attachment=True)
+# -------------------------------
+# EXPORT PDF
+# -------------------------------
+from reportlab.platypus import SimpleDocTemplate, Table
+@app.route("/export_pdf")
+def export_pdf():
+    cursor.execute("""
+        SELECT material_name, predicted_cost, predicted_co2, suitability_score
+        FROM recommendations
+        ORDER BY id DESC
+        LIMIT 10
+    """)
+    rows = cursor.fetchall()
+    pdf_path = "report.pdf"
+    doc = SimpleDocTemplate(pdf_path)
+    data = [["Material", "Cost", "CO2", "Score"]]
+    data.extend(rows)
+    table = Table(data)
+    doc.build([table])
+    return send_file(pdf_path, as_attachment=True)
 # -------------------------------
 # ROUTES
 # -------------------------------
