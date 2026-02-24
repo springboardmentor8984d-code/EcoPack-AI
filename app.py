@@ -201,11 +201,15 @@ def predict_form():
         return render_template("result.html", results=[], full_data=[])
 
     labels, values = get_material_usage()
+    avg_co2 = sum([r["co2_reduction_percent"] for r in results]) / len(results)
+    avg_cost = sum([r["cost_savings"] for r in results]) / len(results)
 
     return render_template(
         "result.html",
         results=results,
         full_data=full_data,
+        avg_co2=round(avg_co2, 2),
+        avg_cost=round(avg_cost, 2),
         usage_labels=labels,
         usage_values=values
     )
