@@ -138,7 +138,7 @@ def recommend_material(input_data):
     )
 
     # tiny randomness (prevents ties but not noticeable)
-    data["suitability_score"] += np.random.uniform(0, 0.001, len(data))
+    data["suitability_score"] += np.random.uniform(0, 0.01, len(data))
 
     # ---------------- METRICS ----------------
     baseline_co2 = data["predicted_co2"].max()
@@ -148,8 +148,6 @@ def recommend_material(input_data):
         (baseline_co2 - data["predicted_co2"]) / baseline_co2
     ) * 100
 
-    # ✅ FIX: remove negative values
-    data["co2_reduction_percent"] = data["co2_reduction_percent"].clip(lower=0)
 
     data["cost_savings"] = baseline_cost - data["predicted_cost"]
 
@@ -157,7 +155,7 @@ def recommend_material(input_data):
     result = data.sort_values("suitability_score", ascending=False)
 
     top_results = result.head(3)
-    full_data = result.head(10)
+    full_data = result.head(15)
 
     # ---------------- SAVE TO DB ----------------
     for _, row in top_results.iterrows():
@@ -280,5 +278,6 @@ def predict_form():
 # -------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
 
