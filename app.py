@@ -18,9 +18,11 @@ cursor = conn.cursor()
 # LOAD MODELS
 # -------------------------------
 cost_model = joblib.load("cost_model.pkl")
-co2_model = joblib.load("co2_model.pkl")
 scaler = joblib.load("scaler.pkl")
-co2_model.set_params(predictor="cpu_predictor")
+from xgboost import XGBRegressor
+
+co2_model = XGBRegressor()
+co2_model.load_model("co2_model.json")
 
 # -------------------------------
 # LOAD DATASET
