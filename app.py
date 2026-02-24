@@ -5,6 +5,9 @@ from sklearn.preprocessing import MinMaxScaler
 import psycopg2
 import numpy as np
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -18,17 +21,13 @@ cursor = conn.cursor()
 # LOAD MODELS
 # -------------------------------
 cost_model = joblib.load("cost_model.pkl")
+co2_model = joblib.load("co2_model.pkl")
 scaler = joblib.load("scaler.pkl")
-from xgboost import XGBRegressor
-
-co2_model = XGBRegressor()
-co2_model.load_model("co2_model.json")
 
 # -------------------------------
 # LOAD DATASET
 # -------------------------------
 df = pd.read_csv("ecopackai_unique_materials_dataset.csv")
-
 
 # -------------------------------
 # PROCESS DATA
@@ -46,10 +45,17 @@ def process_data():
     X_scaled = scaler.transform(X)
 
     data["predicted_cost"] = cost_model.predict(X_scaled)
-    data["predicted_co2"] = co2_model.predict(X_scaled)
+
+    # SAFE CO2 prediction
+    try:
+        co2_pred = co2_model.predict(X_scaled)
+        co2_pred = np.maximum(co2_pred, 0)  # 🚨 prevent negative
+    except:
+        co2_pred = np.zeros(len(data))
+
+    data["predicted_co2"] = co2_pred
 
     return data
-
 
 # -------------------------------
 # MATERIAL USAGE (DB)
@@ -68,7 +74,6 @@ def get_material_usage():
 
     return labels, values
 
-
 # -------------------------------
 # RECOMMENDATION LOGIC
 # -------------------------------
@@ -81,7 +86,7 @@ def recommend_material(input_data):
     shipping = input_data.get("shipping_type", "domestic")
     sustainability = input_data.get("sustainability_priority", "medium")
 
-    # ---------------- FILTERING ----------------
+    # FILTERING
     if fragility == "high":
         data = data[data["tensile_strength_mpa"] >= 4]
     elif fragility == "medium":
@@ -99,32 +104,15 @@ def recommend_material(input_data):
     if data.empty:
         return [], []
 
-    # ---------------- NORMALIZATION ----------------
+    # NORMALIZATION
     scaler_local = MinMaxScaler()
-
     data[["cost_norm", "co2_norm", "strength_norm"]] = scaler_local.fit_transform(
         data[["predicted_cost", "predicted_co2", "tensile_strength_mpa"]]
     )
 
     data["eco_score"] = 1 - (0.5 * data["cost_norm"] + 0.5 * data["co2_norm"])
 
-    # ---------------- INPUT-AWARE BOOSTS ----------------
-    if fragility == "high":
-        data["strength_norm"] *= 1.5
-    elif fragility == "low":
-        data["strength_norm"] *= 0.7
-
-    if sustainability == "high":
-        data["eco_score"] *= 1.5
-    elif sustainability == "low":
-        data["eco_score"] *= 0.7
-
-    if category == "electronics":
-        data["strength_norm"] *= 1.3
-    elif category == "food":
-        data["eco_score"] *= 1.3
-
-    # ---------------- WEIGHTS ----------------
+    # WEIGHTS
     eco_weight = 0.4
     cost_weight = 0.3
     strength_weight = 0.3
@@ -133,36 +121,28 @@ def recommend_material(input_data):
         eco_weight += 0.2
         cost_weight -= 0.1
 
-    # ---------------- FINAL SCORE ----------------
     data["suitability_score"] = (
         eco_weight * data["eco_score"] +
         cost_weight * (1 - data["cost_norm"]) +
         strength_weight * data["strength_norm"]
     )
 
-    # tiny randomness (prevents ties but not noticeable)
-    data["suitability_score"] += np.random.uniform(0, 0.01, len(data))
-
-    # ---------------- METRICS ----------------
-    baseline_co2 = df["co2_emission_kg"].max() if "co2_emission_kg" in df.columns else data["predicted_co2"].max()
-    baseline_cost = df["cost_per_unit"].max() if "cost_per_unit" in df.columns else data["predicted_cost"].max()
-
-    data["co2_reduction_percent"] = (
-    (baseline_co2 - data["predicted_co2"]) / baseline_co2) * 100
-
-    # 🔥 FIX NEGATIVE VALUES
-    data["co2_reduction_percent"] = data["co2_reduction_percent"].clip(lower=0)
-
-
-    data["cost_savings"] = (baseline_cost - data["predicted_cost"]).clip(lower=0)
-
-    # ---------------- SORT ----------------
     result = data.sort_values("suitability_score", ascending=False)
 
-    top_results = result.head(3)
+    top_results = result.head(5)
     full_data = result.head(15)
 
-    # ---------------- SAVE TO DB ----------------
+    # METRICS
+    baseline_co2 = max(data["predicted_co2"].max(), 1)  # avoid division issues
+    baseline_cost = data["predicted_cost"].max()
+
+    top_results["co2_reduction_percent"] = (
+        (baseline_co2 - top_results["predicted_co2"]) / baseline_co2
+    ) * 100
+
+    top_results["cost_savings"] = baseline_cost - top_results["predicted_cost"]
+
+    # SAVE TO DB
     for _, row in top_results.iterrows():
         cursor.execute("""
             INSERT INTO recommendations 
@@ -184,68 +164,12 @@ def recommend_material(input_data):
         full_data.to_dict(orient="records")
     )
 
-
-# -------------------------------
-# EXPORT EXCEL
-# -------------------------------
-@app.route("/export_excel")
-def export_excel():
-    cursor.execute("""
-        SELECT material_name, predicted_cost, predicted_co2, suitability_score,
-               co2_reduction, cost_savings
-        FROM recommendations
-        ORDER BY id DESC
-        LIMIT 50
-    """)
-    rows = cursor.fetchall()
-
-    df_export = pd.DataFrame(rows, columns=[
-        "Material", "Cost", "CO2", "Score", "CO2 Reduction", "Cost Savings"
-    ])
-
-    file_path = "export.xlsx"
-    df_export.to_excel(file_path, index=False)
-
-    return send_file(file_path, as_attachment=True)
-
-
-# -------------------------------
-# EXPORT PDF
-# -------------------------------
-from reportlab.platypus import SimpleDocTemplate, Table
-
-@app.route("/export_pdf")
-def export_pdf():
-
-    cursor.execute("""
-        SELECT material_name, predicted_cost, predicted_co2, suitability_score
-        FROM recommendations
-        ORDER BY id DESC
-        LIMIT 10
-    """)
-    rows = cursor.fetchall()
-
-    pdf_path = "report.pdf"
-
-    doc = SimpleDocTemplate(pdf_path)
-
-    data = [["Material", "Cost", "CO2", "Score"]]
-    data.extend(rows)
-
-    table = Table(data)
-
-    doc.build([table])
-
-    return send_file(pdf_path, as_attachment=True)
-
-
 # -------------------------------
 # ROUTES
 # -------------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
-
 
 @app.route("/predict_form", methods=["POST"])
 def predict_form():
@@ -262,27 +186,16 @@ def predict_form():
     if not results:
         return render_template("result.html", results=[], full_data=[])
 
-    avg_co2 = sum([r["co2_reduction_percent"] for r in results]) / len(results)
-    avg_cost = sum([r["cost_savings"] for r in results]) / len(results)
-
     labels, values = get_material_usage()
 
     return render_template(
         "result.html",
         results=results,
         full_data=full_data,
-        avg_co2=round(avg_co2, 2),
-        avg_cost=round(avg_cost, 2),
         usage_labels=labels,
         usage_values=values
     )
 
-
-# -------------------------------
-# RUN (Render compatible)
 # -------------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
-
+    app.run(debug=False)
