@@ -129,7 +129,7 @@ def recommend_material(input_data):
         data["eco_score"] *= 1.5
     elif sustainability == "low":
         data["eco_score"] *= 0.77
-        if category == "electronics":
+    if category == "electronics":
         data["strength_norm"] *= 1.3
     elif category == "food":
         data["eco_score"] *= 1.3
