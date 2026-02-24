@@ -20,6 +20,7 @@ cursor = conn.cursor()
 cost_model = joblib.load("cost_model.pkl")
 co2_model = joblib.load("co2_model.pkl")
 scaler = joblib.load("scaler.pkl")
+co2_model.set_params(predictor="cpu_predictor")
 
 # -------------------------------
 # LOAD DATASET
