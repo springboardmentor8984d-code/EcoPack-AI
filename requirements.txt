@@ -1,6 +1,11 @@
+Flask
 pandas
-numpy
 scikit-learn
+joblib
+psycopg2-binary
+plotly
+reportlab
+openpyxl
+gunicorn
 xgboost
-matplotlib
-flask
+python-dotenv
