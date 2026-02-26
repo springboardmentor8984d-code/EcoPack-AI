@@ -7,6 +7,10 @@ import pandas as pd                        # For data handling
 import joblib                              # To load saved ML models
 import psycopg2                            # To connect PostgreSQL
 from flask import session
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # ==============================
