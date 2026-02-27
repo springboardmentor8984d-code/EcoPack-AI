@@ -37,7 +37,7 @@ Google Drive Link:
 <https://drive.google.com/file/d/1BpsIeLJS957YpMM4TaA17_-oawO0put9/view?usp=sharing>
 
 After downloading, place the file inside the following folder:
-*/artifacts*
+**/artifacts**
 
 Make sure the file name is:
 cost_model.pkl
@@ -152,7 +152,7 @@ Import the CSV files (product_dataset.csv, shipping_dataset.csv, packaging_mater
 
 Update the DB_URI string in app.py with your PostgreSQL password:
 
-*DB_URI = "postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/ecopack_db"*
+**DB_URI = "postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/ecopack_db"**
 
 ---
 ## 📃 Future Roadmap
