@@ -27,7 +27,21 @@ The modern supply chain operates under a critical dual mandate: reducing extreme
 * **🗄️ Dynamic Database Integration:** Connected to PostgreSQL via SQLAlchemy, ensuring the frontend Predictor UI always pulls the latest live catalog of products and shipping routes.
 
 ---
+## Cost Model File (Large File)
 
+The trained cost model file is not included in this repository due to GitHub file size limitations (70MB).
+
+Download the model from the link below:
+
+Google Drive Link:
+<https://drive.google.com/file/d/1BpsIeLJS957YpMM4TaA17_-oawO0put9/view?usp=sharing>
+
+After downloading, place the file inside the following folder:
+*/artifacts*
+
+Make sure the file name is:
+cost_model.pkl
+---
 ## 📸 3. Application Screenshots
 
 ### The Predictor Interface
@@ -137,8 +151,8 @@ Create a new database named ecopack_db.
 Import the CSV files (product_dataset.csv, shipping_dataset.csv, packaging_materials.csv) to create the base tables.
 
 Update the DB_URI string in app.py with your PostgreSQL password:
-bash:
-DB_URI = "postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/ecopack_db"
+
+*DB_URI = "postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/ecopack_db"*
 
 ---
 ## 📃 Future Roadmap
