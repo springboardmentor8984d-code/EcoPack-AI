@@ -1,0 +1,16 @@
+shipping_type,distance_km,delivery_days,temperature_control,handling_risk
+Local Delivery,50,1,0,3
+City Delivery,100,2,0,4
+Regional Transport,500,4,0,5
+National Transport,1500,7,0,7
+Cold Chain Transport,800,3,1,8
+Express Air Cargo,2000,2,0,6
+International Shipping,6000,10,0,9
+Pharma Cold Chain,1200,4,1,9
+Fragile Goods Transport,800,5,0,8
+Ecommerce Standard,700,6,0,5
+Same Day Delivery,30,1,0,4
+Overnight Express,1200,1,0,6
+Refrigerated Truck,600,2,1,7
+Frozen Goods Shipping,900,3,1,9
+Bulk Cargo,3000,12,0,6

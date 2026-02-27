@@ -1,0 +1,51 @@
+material_type,strength,weight_capacity,cost_per_unit,biodegradability_score,co2_emission_score,recyclability_percent
+Corrugated Cardboard (3-ply),6,12,8,9,3,85
+Corrugated Cardboard (5-ply),7,15,9.5,9,3,85
+Corrugated Cardboard (7-ply),8,20,12,9,4,85
+Waxed Cardboard,7,16,11.5,7,4,60
+Recycled Cardboard,6,14,7.5,9,2,90
+Virgin Cardboard,7,15,10,8,4,80
+Kraft Paper,5,10,6.5,9,2,90
+Bleached Paper,4,8,7,8,3,85
+Paper Bag,5,12,7.5,8,3,90
+Recycled Paper,5,11,6,9,2,95
+Molded Pulp Tray,7,14,12,8,3,90
+Molded Fiber Box,8,18,14,8,4,90
+Bagasse Board,7,15,13,9,3,85
+PLA Bioplastic Film,5,12,14.5,8,6,60
+PLA Rigid Container,6,14,16,8,6,60
+PHA Bioplastic Film,6,13,17,8,7,65
+PHA Rigid Container,7,16,18.5,8,7,65
+Starch-Based Film,4,8,9.5,9,5,50
+Cellulose Film,5,10,11,9,4,55
+PET Plastic Bottle,6,15,10,1,9,70
+PET Food Tray,5,12,9.5,1,9,65
+Recycled PET (rPET),6,15,11,1,7,75
+HDPE Container,7,17,11.5,1,8,80
+LDPE Film,5,10,8.5,1,8,40
+PP Plastic Box,6,14,10.5,1,9,60
+Multilayer Plastic Pack,6,13,12,1,10,20
+Glass Bottle,8,18,20,2,9,90
+Glass Jar,9,20,22,2,9,90
+Lightweight Glass,7,15,18.5,2,8,85
+Aluminum Can,8,16,18,2,10,95
+Aluminum Foil,5,8,14,2,10,80
+Steel Can,9,22,19.5,2,11,90
+Tin Container,8,18,17,2,10,85
+Wooden Crate,9,25,25,7,6,70
+Plywood Box,8,22,20,6,7,60
+Bamboo Packaging,7,18,16,9,4,80
+Jute Sack,6,20,12,9,3,85
+Cotton Packaging,5,15,14,8,4,70
+Reusable Plastic Crate,9,30,30,1,10,50
+Reusable PP Box,8,25,28,1,9,55
+Thermoformed PET,6,14,12.5,1,9,65
+EPS Foam,4,6,6,1,11,10
+Paper Foam,5,10,10.5,8,4,75
+Mycelium Packaging,6,14,15,10,3,60
+Seaweed Packaging,5,12,14.5,10,3,55
+Palm Leaf Plate,4,8,7,10,2,80
+Banana Leaf Wrap,3,5,5.5,10,2,85
+Corn Husk Wrap,4,7,6.5,9,3,80
+Coconut Fiber Tray,6,12,13,9,3,75
+Sugarcane Pulp Box,7,16,14,9,3,85
