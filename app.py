@@ -40,13 +40,14 @@ scaler = joblib.load("models/scaler.pkl")
 # DATABASE CONNECTION
 # ==============================
 
-
-conn = psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD")
-)
+def get_db_connection():
+    conn = psycopg2.connect(
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD")
+    )
+    return conn
 
 
 # ==============================
@@ -83,8 +84,10 @@ def recommend_material():
     # ------------------------------------
     # 2. LOAD MATERIALS FROM DATABASE
     # ------------------------------------
-    df = pd.read_sql("SELECT * FROM materials", conn)
 
+    conn = get_db_connection()
+    df = pd.read_sql("SELECT * FROM materials", conn)
+    conn.close()
 
     # ------------------------------------
     # 3. FILTER UNSUITABLE MATERIALS
@@ -283,7 +286,9 @@ def analytics():
     reduction_chart = pio.to_html(reduction_fig, full_html=False)
 
     # 6️⃣ Material Usage Trend (Full Dataset)
+    conn = get_db_connection()
     full_df = pd.read_sql("SELECT * FROM materials", conn)
+    conn.close()
     usage_counts = full_df["material_name"].value_counts().reset_index()
     usage_counts.columns = ["material", "count"]
 
