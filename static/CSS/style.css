@@ -1,0 +1,246 @@
+/* =========================================================
+   EcoPackAI | Master Stylesheet 
+   Combines Core 2.0 Dashboard UI & Prediction Interface
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Core Color Palette */
+    --primary-color: #1e5631;       /* Deep Forest Green */
+    --primary-hover: #153d23;
+    --accent-color: #4c9a2a;        /* Vibrant Eco Green */
+    --accent-hover: #3d7a22;
+    --accent-light: #aed581;
+    
+    /* Backgrounds & Borders */
+    --bg-color: #f7f9fa;            /* Ultra-clean light gray for BI feel */
+    --card-bg: #ffffff;
+    --border-color: #edf1f2;
+    
+    /* Typography */
+    --text-main: #2c3e50;           /* Soft Black */
+    --text-muted: #7f8c8d;          /* Cool Gray */
+}
+
+/* --- Global Settings --- */
+body {
+    background-color: var(--bg-color);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* --- Navigation Bars --- */
+.custom-nav {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2e7d32 100%);
+    border-bottom: 3px solid var(--accent-color);
+    padding: 1rem 0;
+}
+
+.text-accent {
+    color: var(--accent-light);
+}
+
+/* --- Sidebar (Dashboard) --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--card-bg);
+    min-height: 100vh;
+    border-right: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+}
+
+.nav-link {
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.nav-link.active {
+    background-color: var(--primary-color);
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(30, 86, 49, 0.2);
+}
+
+.nav-link:hover:not(.active) {
+    background-color: #f0f4f2;
+    color: var(--primary-color);
+}
+
+/* --- Global Cards --- */
+.card, .kpi-card, .chart-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* --- Form Elements --- */
+.form-label {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.form-select, .form-control {
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    transition: all 0.2s;
+    cursor: pointer;
+    background-color: #fcfdfd;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(76, 154, 42, 0.15);
+    background-color: #ffffff;
+}
+
+/* --- Buttons --- */
+.custom-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-btn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(76, 154, 42, 0.3);
+    color: white;
+}
+
+/* --- Table Styling (Prediction Output) --- */
+.custom-table {
+    margin-bottom: 0;
+}
+
+.custom-table th {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
+    background-color: transparent;
+    padding-bottom: 12px;
+}
+
+.custom-table td {
+    padding: 1.2rem 0.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Rank Circle Badge */
+.rank-circle {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0 auto;
+    box-shadow: 0 3px 8px rgba(30, 86, 49, 0.3);
+}
+
+/* --- Dashboard Specific (KPIs & Icons) --- */
+.icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+/* Contextual Icon Colors */
+.bg-success-light { background-color: #e8f5e9; color: #2e7d32; }
+.bg-primary-light { background-color: #e3f2fd; color: #1565c0; }
+.bg-warning-light { background-color: #fff8e1; color: #f57f17; }
+
+/* Empty State / Awaiting Parameters */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #e8f5e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Plotly Chart Overrides --- */
+.js-plotly-plot .plotly .main-svg {
+    border-radius: 16px;
+}
+
+/* --- Animations --- */
+.fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(15px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Scrollbar Styling for a polished feel */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

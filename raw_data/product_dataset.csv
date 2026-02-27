@@ -1,0 +1,31 @@
+product_name,industry_type,avg_weight,fragility_level,shelf_life_days,moisture_sensitivity,chemical_sensitivity,length_cm,width_cm,height_cm
+Mobile Phone,Electronics,0.3,8,3650,2,2,15.0,7.5,0.8
+Laptop,Electronics,1.5,8,3650,2,2,35.0,24.0,2.0
+LED Bulb,Electronics,0.4,7,3650,2,2,6.0,6.0,12.0
+Biscuits,Food,0.5,3,180,5,7,20.0,5.0,5.0
+Fresh Vegetables,Food,1,4,10,8,9,30.0,20.0,15.0
+Frozen Food,Food,1.2,5,90,9,9,25.0,20.0,5.0
+Rice Bag,Food,5,2,730,4,6,40.0,30.0,10.0
+Milk Powder,Food,1,3,365,7,8,12.0,12.0,18.0
+Cough Syrup,Pharma,0.5,6,730,8,9,5.0,5.0,12.0
+Tablets,Pharma,0.2,5,1095,7,9,8.0,5.0,2.0
+Insulin Injection,Pharma,0.3,7,180,9,9,15.0,4.0,3.0
+Face Cream,Cosmetics,0.4,4,730,6,7,6.0,6.0,5.0
+Shampoo Bottle,Cosmetics,0.8,5,730,6,7,8.0,5.0,22.0
+Perfume Bottle,Cosmetics,0.6,8,1825,4,5,6.0,6.0,12.0
+Soap,Cosmetics,0.3,2,1095,2,3,9.0,6.0,3.0
+Shoes,Retail,1,3,3650,1,1,30.0,20.0,10.0
+Clothes,Retail,0.8,2,3650,1,1,35.0,25.0,2.0
+Glass Plates,Home,2.5,9,3650,2,2,25.0,25.0,10.0
+Ceramic Vase,Home,3,9,3650,2,2,15.0,15.0,30.0
+Steel Utensils,Home,2,5,3650,1,1,30.0,10.0,5.0
+Chocolate Bar,Food,0.1,2,365,6,8,15.0,6.0,1.0
+Cheese Block,Food,0.5,3,90,7,8,10.0,8.0,5.0
+Vitamin Syrup,Pharma,0.4,6,730,7,9,5.0,5.0,12.0
+Eye Drops,Pharma,0.2,6,365,8,9,3.0,3.0,7.0
+Hair Oil,Cosmetics,0.5,4,1095,5,6,6.0,4.0,15.0
+Deodorant,Cosmetics,0.3,5,1095,3,4,5.0,5.0,18.0
+Smart Watch,Electronics,0.2,7,3650,2,2,10.0,10.0,6.0
+Camera Lens,Electronics,0.4,9,3650,2,2,8.0,8.0,10.0
+Flower Bouquet,Food,1.2,4,7,9,7,40.0,20.0,15.0
+Vaccines,Pharma,0.3,7,90,10,10,5.0,5.0,5.0
