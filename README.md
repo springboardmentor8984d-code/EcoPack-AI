@@ -6,10 +6,6 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-Machine%20Learning-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
 ![XGBoost](https://img.shields.io/badge/XGBoost-Regression-red?style=for-the-badge)
 
-<div align="center">
-  <img src="Images/banner.png" alt="EcoPackAI Banner" width="100%">
-</div>
-
 **EcoPackAI** is an end-to-end Machine Learning control center designed to autonomously optimize enterprise packaging decisions. By analyzing product fragility, dimensional weights, and complex logistics routes, the system utilizes advanced dual-regression models to predict the exact financial cost and CO₂ footprint of over 50 different packaging materials in real-time.
 
 ---
@@ -41,23 +37,6 @@ The modern supply chain operates under a critical dual mandate: reducing extreme
 ### Real-Time BI Dashboard
 > *Live telemetry updating every 3 seconds, showing total CO₂ saved, cost reductions, and dynamic material adoption charts.*
 ![Live Dashboard](Images/live_dashboard.png)
-
-### The AI Recommendation Engine
-> *The algorithmically ranked output showing the financial cost, carbon footprint, and final AI Match percentage.*
-![Prediction Results](Images/prediction_results.png)
-
----
-## 🛠️ Tech Stack & Technologies
-```
-| Layer | Technology | Description |
-| :--- | :--- | :--- |
-| **Backend API** | Python, Flask, Joblib | Stateless REST API handling inference and routing. |
-| **Database** | PostgreSQL, SQLAlchemy | Relational storage for live catalog updates. |
-| **Machine Learning** | Scikit-Learn, XGBoost | `ColumnTransformer`, Random Forest, XGBoost. |
-| **Frontend UI** | HTML5, Bootstrap 5, JS | Responsive predictor interface. |
-| **Analytics & Data** | Plotly.js, Pandas, Numpy | Real-time charts and synthetic data engineering. |
-| **Export Engines** | `html2pdf.js`, `xlsxwriter` | 1-click PDF reports and Excel telemetry exports. |
-```
 ---
 ## 🏗️ System Architecture
 
@@ -92,14 +71,13 @@ The models were trained on a deterministic, physics-based synthetic dataset of 2
 ## 📝 **Model Performance**
 The algorithms successfully reverse-engineered the complex logistical formulas utilized during the data generation phase, they achieved perfect predictive accuracy:
 
-```
 | Target Model | Target Variable | R² Score |
 | :--- | :--- | :--- |
 | **Random Forest** | target_cost (INR) | 1.0000 |
 | **XGBoost** | target_co2 (kg) | 1.0000 |
-```
+
 ---
-📁 **Project Structure**
+### 📁 **Project Structure**
 ```
 EcoPackAI/
 ├── artifacts/
@@ -126,15 +104,25 @@ EcoPackAI/
 ├── requirements.txt          # Python Dependencies
 └── README.md                 # Project Documentation
 ```
-
+---
+## 🛠️ Technology Stack
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Backend Framework** | Python 3.9, Flask | Stateless REST API handling routing and ML inference. |
+| **Database** | PostgreSQL, SQLAlchemy | Relational storage for dynamic UI population. |
+| **Machine Learning** | Scikit-Learn, XGBoost | Feature preprocessing, regression, and data manipulation. |
+| **Frontend UI** | HTML5, Bootstrap 5, Vanilla JS | Responsive predictor interface and dashboard layout. |
+| **Data Visualization** | Plotly.js | Interactive, asynchronous charting engine. |
+| **Reporting/Export** | `html2pdf.js`, `xlsxwriter` | 1-click PDF reports and Excel telemetry exports. |
+---
 ## ⚙️ **Getting Started**
-Prerequisites
+### Prerequisites
 
 Python 3.9+
 
 PostgreSQL installed and running on port 5432.
 
-# Bash
+### Bash
 
 git clone [https://github.com/CHERRY0456/EcoPackAI.git](https://github.com/CHERRY0456/EcoPackAI.git)
 
@@ -149,7 +137,7 @@ Create a new database named ecopack_db.
 Import the CSV files (product_dataset.csv, shipping_dataset.csv, packaging_materials.csv) to create the base tables.
 
 Update the DB_URI string in app.py with your PostgreSQL password:
-`bash:
+bash:
 DB_URI = "postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/ecopack_db"
 
 ---
