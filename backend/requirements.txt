@@ -1,0 +1,12 @@
+flask
+flask-cors
+pandas
+numpy
+joblib
+python-dotenv
+sqlalchemy
+psycopg2-binary
+scikit-learn
+xgboost
+gunicorn
+reportlab
