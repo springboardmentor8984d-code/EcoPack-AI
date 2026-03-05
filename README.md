@@ -1,179 +1,215 @@
-# EcoPackAI – AI-Powered Sustainable Packaging Recommendation System
+# 🌱 EcoPack-AI
 
-EcoPackAI is an AI-powered full-stack web platform designed to recommend optimal packaging materials based on product attributes, sustainability parameters, and industry standards.
+AI-Based Sustainable Packaging Recommendation System built with Flask, Machine Learning, and PostgreSQL.
 
-## Features
-- **Material Recommendation**: Get ranked eco-friendly materials based on strength and weight requirements.
-- **Sustainability Analytics**: Visualize CO2 impact and cost efficiency.
-- **ML-Powered Predictions**: Uses Random Forest and XGBoost to predict costs and environmental footprints.
-- **Modern UI**: Glassmorphism design for a premium user experience.
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-API-000000?logo=flask&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-F7931E?logo=scikitlearn&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-Regression-EC1C24)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?logo=postgresql&logoColor=white)
+![Render](https://img.shields.io/badge/Deploy-Render-46E3B7)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-## Project Structure
-- `data/`: Contains raw CSV data.
-- `src/`: Core logic including data management, feature engineering, and Flask API.
-- `models/`: Trained ML models (joblib format).
-- `templates/`: HTML templates for the frontend.
-- `static/`: Static assets (CSS, JS).
+![Dashboard Overview](images/dashboard-main.png)
 
-## How to Run
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Set up PostgreSQL:
-   - Ensure you have a running PostgreSQL instance.
-   - Create a database (default: `ecopack_db`).
-   - Configure connection via environment variables if needed (defaults: `DB_USER=postgres`, `DB_PASSWORD=password`, `DB_HOST=localhost`, `DB_PORT=5432`).
-3. Initialize data and train models:
-   ```bash
-   python src/data_management.py
-   python src/feature_engineering.py
-   python src/model_training.py
-   ```
-4. Run the Flask application:
-   ```bash
-   python src/app.py
-   ```
-5. Access the app at `http://127.0.0.1:5000`
+## 🚀 Project Overview
 
-## Tech Stack
-- **Backend**: Flask (Python)
-- **Database**: PostgreSQL
-- **Machine Learning**: Scikit-learn, XGBoost
-- **Frontend**: HTML5, Bootstrap 5, Chart.js, Glassmorphism CSS
-- **Analytics**: Plotly/Chart.js
-## Overview
-EcoPackAI is a Machine Learning–driven decision support system that recommends sustainable packaging materials based on product characteristics and sustainability priorities.
+EcoPack-AI recommends the most suitable packaging material based on:
 
-The system predicts:
-- Packaging Cost
-- CO₂ Emission Impact
+- Product category
+- Fragility level
+- Shipping type
+- Sustainability priority
 
-It ranks materials using a dynamic weighted scoring framework and visualizes results through an interactive dashboard.
+The system predicts and ranks materials using:
+
+- Packaging cost
+- CO₂ impact
+- Material suitability score
+
+Recommendations are stored in the database and visualized in a BI-style dashboard with analytics and export options.
+
+## 🧠 Core Features
+
+- Intelligent recommendation engine with category + fragility filtering
+- Dynamic weighted scoring logic based on sustainability priority and shipping type
+- Interactive dashboard analytics (distribution, ranking, trends)
+- Recommendation history tracking with clear-history endpoint
+- Export support (PDF / Excel on frontend)
+- Environment-based DB configuration (PostgreSQL + SQLite fallback)
+
+## 🏛 Architecture
+
+The platform follows a layered architecture from UI → Flask API → ML models → PostgreSQL → BI dashboard.
+
+![System Architecture](images/architecture_new.png)
+
+## 🏗 Tech Stack
+
+- **Backend:** Python, Flask, Flask-CORS
+- **Data/ML:** Pandas, NumPy, Scikit-learn, XGBoost, Joblib
+- **Database:** PostgreSQL (production), SQLite (local fallback), SQLAlchemy
+- **Frontend:** HTML, CSS, JavaScript, Chart.js, Plotly
+- **Deployment:** Gunicorn, Render
+
+## 📁 Project Structure
+
+```text
+EcoPackAI/
+├── backend/
+│   ├── app.py
+│   ├── requirements.txt
+│   ├── rf_cost_model.pkl
+│   ├── xgb_co2_model.pkl
+│   └── scaler.pkl
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│   └── config.js
+├── images/
+│   ├── architecture_new.png
+│   ├── dashboard-main.png
+│   ├── material-distribution.png
+│   ├── recommendation-trends.png
+│   ├── model-metrics-cost.png
+│   ├── model-metrics-co2.png
+│   └── best-material-output.png
+├── model_training.ipynb
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── Procfile
+├── runtime.txt
+└── README.md
+```
+
+## 🔌 API Endpoints
+
+- `GET /` → Health check
+- `POST /recommend` → Generate top material recommendations
+- `GET /history` → Retrieve recommendation history
+- `POST /history/clear` → Clear stored history
+- `GET /analytics` → Dashboard analytics aggregates
+
+## ⚙️ Environment Variables
+
+Create a `.env` file using `.env.example`:
+
+```env
+API_KEY=change_me
+DATABASE_URL=postgresql://username:password@localhost:5432/ecopackai
+```
+
+> Note: Current code requires `DATABASE_URL` for PostgreSQL; if not provided, it automatically uses local SQLite (`ecopackai.db`) for development.
+
+## 💻 Run Locally
+
+1. Open terminal in project root:
+
+	```bash
+	cd backend
+	```
+
+2. Create and activate virtual environment (Windows):
+
+	```bash
+	python -m venv venv
+	venv\Scripts\activate
+	```
+
+3. Install dependencies:
+
+	```bash
+	pip install -r requirements.txt
+	```
+
+4. Start backend:
+
+	```bash
+	python app.py
+	```
+
+5. Open frontend file `frontend/index.html` in browser (or host via a simple static server).
+
+## ☁️ Deployment (Render)
+
+- **Build Command**
+
+  ```bash
+  pip install -r backend/requirements.txt
+  ```
+
+- **Start Command**
+
+  ```bash
+  gunicorn backend.app:app
+  ```
+
+- **Required Environment Variables**
+  - `DATABASE_URL`
+  - `API_KEY` (reserved for secured endpoint enhancements)
+
+## 📊 Evaluation Summary
+
+Models are evaluated using:
+
+- MAE
+- RMSE
+- R² Score
+
+Two model roles:
+
+- Random Forest → packaging cost prediction
+- XGBoost → CO₂ prediction used in ranking
+
+### Model Results Snapshot
+
+**Random Forest (Cost Prediction):**
+
+![Random Forest Metrics](images/model-metrics-cost.png)
+
+**XGBoost (CO₂ Prediction):**
+
+![XGBoost Metrics](images/model-metrics-co2.png)
+
+## 🖥 Dashboard Screenshots
+
+### Main BI Dashboard
+
+<img src="images/dashboard-main.png" alt="Main Dashboard" width="100%" />
+
+### Material Distribution & Comparison
+
+<img src="images/material-distribution.png" alt="Material Distribution" width="100%" />
+
+### Sustainability Ranking & Recommendation Trends
+
+<img src="images/recommendation-trends.png" alt="Recommendation Trends" width="100%" />
+
+### Best Material Output (Notebook Validation)
+
+<img src="images/best-material-output.png" alt="Best Material Output" width="70%" />
+
+## 🧩 Screenshot File Checklist
+
+Place these exact files inside the `images/` folder (same spelling and case):
+
+- `architecture_new.png`
+- `dashboard-main.png`
+- `material-distribution.png`
+- `recommendation-trends.png`
+- `model-metrics-cost.png`
+- `model-metrics-co2.png`
+- `best-material-output.png`
+
+## 👨‍💻 Author
+
+**Rajan Kumar**
+
+- GitHub: https://github.com/RajanKumar44
 
 ---
 
-## Key Features
-- Machine Learning–based cost and CO₂ prediction
-- Dynamic weighted ranking logic
-- Top 5 recommendation system
-- Interactive BI dashboard (Plotly charts)
-- PostgreSQL cloud database logging
-- Excel export (Full ranking report)
-- PDF export (Top 5 summary report)
-- Production-ready deployment (Render + Gunicorn)
-
----
-
-## Technologies Used
-
-### Backend
-- Python
-- Flask
-- Gunicorn (Production WSGI Server)
-
-### Machine Learning
-- Random Forest Regressor
-- XGBoost Regressor
-- Scikit-learn
-
-### Frontend
-- HTML
-- Bootstrap
-- JavaScript
-
-### Visualization
-- Plotly
-
-### Database
-- PostgreSQL (Render Cloud)
-- Environment-based secure configuration
-
-### Export
-- Pandas (Excel)
-- ReportLab (PDF)
-
----
-
-## System Workflow
-1. User selects product filters (category, fragility, shipping type, sustainability priority).
-2. Backend generates feature vector.
-3. ML models predict cost and CO₂ impact.
-4. Weighted ranking formula calculates final score.
-5. Top 5 materials are displayed.
-6. Usage data is logged into PostgreSQL database.
-7. Reports can be exported in Excel or PDF format.
-
----
-
-## Ranking Logic
-
-Final Score is calculated using:
-
-Final Score =  
-(Weight₁ × Predicted Cost) +  
-(Weight₂ × Predicted CO₂) +  
-(Weight₃ × Suitability Score)
-
-Weights dynamically adjust based on:
-- Shipping type (Domestic / International)
-- Sustainability priority (Low / Medium / High)
-
-Lower final score → Higher rank.
-
----
-
-## Live Deployment
-
-Backend deployed on Render:
-
-https://ecopackai-backend-6rv7.onrender.com
-
----
-
-## Installation & Local Setup
-
-1. Clone the repository
-
-2. Install dependencies:
-   pip install -r requirements.txt
-
-3. Set environment variable:
-   DATABASE_URL=your_postgresql_connection_string
-
-
-4. Run locally:
-   python app.py
-
-
----
-
-## Production Setup
-
-The application runs in production using:
-gunicorn app:app
-
-
-Debug mode is disabled in production.
-
----
-
-## Current Status
-- ML model training completed
-- Flask backend fully implemented
-- Dashboard integration completed
-- PostgreSQL cloud integration completed
-- Production deployment completed
-- Export functionality verified
-- System production-ready
-
----
-
-## Future Enhancements
-- Real-time carbon emission API integration
-- Multi-dataset support
-- Advanced authentication & user roles
-- Enterprise-scale scalability improvements
-
----
+If you like this project, give it a ⭐ on GitHub.
 
