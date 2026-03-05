@@ -177,6 +177,3 @@ Debug mode is disabled in production.
 
 ---
 
-## Author
-Nilesh Gawhale  
-Infosys Springboard Internship – Batch 11
